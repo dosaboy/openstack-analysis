@@ -12,31 +12,21 @@ process_log ()
     local LOG=$1
     local DATA_TMP=$2
     local CSV_PATH=$3
+    local EXPR1="$4"
+    local EXPR2="$5"
     local CATCMD
     local MAX_JOBS=10
     local NUM_JOBS=0
 
-    if [[ -e $CSV_PATH ]]; then
-        if ! $OVERWRITE_CSV; then
-            echo "$CSV_PATH already exists and overwrite=false - skipping"
-            exit 0
-        fi
-
-        rm -f $CSV_PATH
-    fi
-
+    ensure_csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
-    preamble_common='[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ os_vif \[req-[0-9a-z-]+ ([0-9a-z-]+) ([0-9a-z-]+) .+\]'
-
-    e1="s/$preamble_common Plugging vif .+/\0/p"
     # NOTE: exclude service thread
-    readarray -t starts<<<$(get_categories $CATCMD $LOG "$e1"| grep -v "\- - - - -]")
+    readarray -t starts<<<$(get_categories $CATCMD $LOG "$EXPR1"| grep -v "\- - - - -]")
     (( ${#starts[@]} )) && [[ -n ${starts[0]} ]] || return
 
-    e2="s/$preamble_common Successfully plugged vif .+/\0/p"
     # NOTE: exclude service thread
-    readarray -t ends<<<$(get_categories $CATCMD $LOG "$e2"| grep -v "\- - - - -]")
+    readarray -t ends<<<$(get_categories $CATCMD $LOG "$EXPR2"| grep -v "\- - - - -]")
     (( ${#ends[@]} )) && [[ -n ${ends[0]} ]] || return
 
     declare -A UPDATE_STARTS=()
@@ -78,6 +68,14 @@ process_log ()
 
 data_tmp=`mktemp -d -p $RESULTS_DIR`
 csv_path=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
-process_log $LOG $data_tmp $csv_path
+module=os_vif
+preamble_common="[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module \[req-[0-9a-z-]+ ([0-9a-z-]+) ([0-9a-z-]+) .+\]"
+e1="s/$preamble_common Plugging vif .+/\0/p"
+e2="s/$preamble_common Successfully plugged vif .+/\0/p"
+
+FILTERED=$(mktemp -p $data_tmp)
+grep $module $LOG > $FILTERED
+process_log $FILTERED $data_tmp $csv_path "$e1" "$e2"
+
 write_meta $RESULTS_DIR time os-vif-plug-time
 cleanup $data_tmp $csv_path

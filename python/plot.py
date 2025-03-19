@@ -33,6 +33,10 @@ class PLOT():
                                                 'meta.yaml')))
 
     @property
+    def output(self):
+        return os.path.join(self.output_dir, f"{self.name}.png")
+
+    @property
     def path(self):
         return sys.argv[1]
 
@@ -52,8 +56,17 @@ class PLOT():
     def csv(self):
         return pd.read_csv(self.path)
 
+    @property
+    def force(self):
+        return os.environ.get('OVERWRITE_CSV') == "true"
+
     def stacked(self):
         print(f"Plotting data for {self.name} ({self.path})")
+        if os.path.exists(self.output) and not self.force:
+            print(f"INFO: {self.output} already exists - use --overwrite to "
+                  "recreate")
+            return
+
         data = self.csv
         _, ax = plt.subplots()
         stacked = []
@@ -65,14 +78,10 @@ class PLOT():
             except ValueError:
                 x.append(datetime.datetime.strptime(d, '%Y-%m-%d:%H:%M'))
 
-        #bottom = np.zeros(144)
         for key, val in data.items():
             if key != 'datetime':
                 labels.append(key)
                 stacked.append([int(e) for e in val])
-                #xxx = np.array(val)
-                #ax.bar(x, val, label=key, bottom=bottom)
-                #bottom += val
 
         ax.stackplot(x, stacked, labels=labels)
         plt.xlabel(self.meta['xlabel'])
@@ -81,10 +90,9 @@ class PLOT():
         plt.subplots_adjust(**PlotSettings())
         plt.tight_layout()
         plt.gcf().set_size_inches(self.PLOT_SIZE_X, self.PLOT_SIZE_Y)
-        plt.savefig(os.path.join(self.output_dir, f"{self.name}.png"),
-                       dpi=100,
-                       bbox_inches='tight',
-                       pad_inches=self.PLOT_PAD_INCHES)
+        plt.savefig(self.output, dpi=100,
+                    bbox_inches='tight',
+                    pad_inches=self.PLOT_PAD_INCHES)
 
     def test(self):
         import matplotlib.plt as plt
@@ -131,17 +139,20 @@ class PLOT():
 
         # Plot the stacked bar chart
         plt.figure(figsize=(12, 6))
-        df.set_index('datetime').plot(kind='bar', stacked=True, figsize=(12, 6))
+        df.set_index('datetime').plot(kind='bar', stacked=True,
+                                      figsize=(12, 6))
         plt.xlabel('Time')
         plt.ylabel('Value')
         plt.title('Stacked Bar Chart of CSV Data')
-        plt.legend(title='Category', bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.legend(title='Category', bbox_to_anchor=(1.05, 1),
+                   loc='upper left')
         plt.xticks(rotation=45)
         plt.tight_layout()
 
         # Show the plot
         plt.show()
 
+
 if __name__ == "__main__":
     PLOT().stacked()
-    #PLOT().test2()
+    # PLOT().test2()

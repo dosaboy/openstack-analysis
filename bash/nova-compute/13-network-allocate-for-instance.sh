@@ -16,15 +16,7 @@ process_log ()
     local MAX_JOBS=10
     local NUM_JOBS=0
 
-    if [[ -e $CSV_PATH ]]; then
-        if ! $OVERWRITE_CSV; then
-            echo "$CSV_PATH already exists and overwrite=false - skipping"
-            exit 0
-        fi
-
-        rm -f $CSV_PATH
-    fi
-
+    ensure_csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
     preamble_common='[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ nova.network.neutron \[req-[0-9a-z-]+ ([0-9a-z-]+) ([0-9a-z-]+) .+\] \[instance: ([0-9a-z-]+)\]'
@@ -78,6 +70,11 @@ process_log ()
 
 data_tmp=`mktemp -d -p $RESULTS_DIR`
 csv_path=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
-process_log $LOG $data_tmp $csv_path
+module=nova.network.neutron
+
+FILTERED=$(mktemp -p $data_tmp)
+grep $module $LOG > $FILTERED
+process_log $FILTERED $data_tmp $csv_path
+
 write_meta $RESULTS_DIR time net-allocate-time
 cleanup $data_tmp $csv_path

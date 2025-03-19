@@ -15,7 +15,13 @@ get_categories ()
 
 data_tmp=`mktemp -d -p $RESULTS_DIR`
 csv_path=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
-e2='s/([0-9-]+) ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ ovsdbapp.backend.ovs_idl.transaction \[.+\] Running txn .+/\20/p'
-process_log $LOG $data_tmp $csv_path "" "$e2"
+module=ovsdbapp.backend.ovs_idl.transaction
+e1=""
+e2="s/([0-9-]+) ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module \[.+\] Running txn .+/\20/p"
+
+FILTERED=$(mktemp -p $data_tmp)
+grep $module $LOG > $FILTERED
+process_log $FILTERED $data_tmp $csv_path "$e1" "$e2"
+
 write_meta $RESULTS_DIR time ovsdbapp-transactions
 cleanup $data_tmp $csv_path
