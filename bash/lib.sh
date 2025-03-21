@@ -238,8 +238,10 @@ filter_log ()
     local path=$1
     local filter="$2"
     local filtered=
+    local cmd=grep
 
+    file --mime-type $path| grep -q application/gzip && cmd=zgrep
     filtered=$(mktemp -p $data_tmp)
-    grep "$filter" $path > $filtered
+    $cmd "$filter" $path > $filtered
     echo $filtered
 }
