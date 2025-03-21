@@ -18,7 +18,7 @@ process_log ()
     ensure_csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
-    declare -a CATEGORY=( $($CATCMD $LOG| sed -rn 's/[0-9-]+ [0-9:.]+ [0-9]+ \w+ nova.compute.manager \[req-[0-9a-z-]+ ([0-9a-z-]+) ([0-9a-z-]+) .+\] .+ Took ([0-9]+).[0-9]+ seconds to build instance./\2/p'| sort -u) )
+    declare -a CATEGORY=( $($CATCMD $LOG| sed -rn 's/[0-9-]+ [0-9:.]+ [0-9]+ \w+ nova.compute.manager \[req-[0-9a-z-]+ [0-9a-z-]+ ([0-9a-z-]+) .+\] .+ Took ([0-9]+).[0-9]+ seconds to build instance./\1/p'| sort -u) )
     (( ${#CATEGORY[@]} )) || return
 
     init_dataset $DATA_TMP "" ${CATEGORY[@]}
@@ -27,7 +27,7 @@ process_log ()
     echo "0" > $flag
     for c in ${CATEGORY[@]}; do
         ((NUM_JOBS+=1))
-        readarray -t ret<<<$($CATCMD $LOG| sed -rn "s/([0-9-]+) ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ nova.compute.manager \[req-[0-9a-z-]+ [0-9a-z-]+ $c .+\] Took ([0-9]+).[0-9]+ seconds to build instance./\20 \3/p")
+        readarray -t ret<<<$($CATCMD $LOG| sed -rn "s/[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ nova.compute.manager \[req-[0-9a-z-]+ [0-9a-z-]+ $c .+\] Took ([0-9]+).[0-9]+ seconds to build instance./\10 \2/p")
         for t in "${ret[@]}"; do
             declare -a tt=( $t )
             path=${DATA_TMP}/${tt[0]//:/_}
