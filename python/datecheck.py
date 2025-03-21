@@ -9,4 +9,3 @@ if __name__ == "__main__":
     delta = _to - _from
     if delta > timedelta():
         print(f"{sys.argv[2][:-4]}0 {delta.seconds}")
-

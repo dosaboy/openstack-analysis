@@ -12,6 +12,7 @@ import yaml
 
 
 class PlotSettings(UserDict):
+    """ Matplotlib graph settings. """
     def __init__(self):
         init = {
             'left': 0.04,
@@ -23,14 +24,17 @@ class PlotSettings(UserDict):
 
 
 class PLOT():
+    """
+    Plot graph from csv data.
+    """
     PLOT_SIZE_X = 23
     PLOT_SIZE_Y = 12
     PLOT_PAD_INCHES = 0.25
 
     @cached_property
     def meta(self):
-        return yaml.safe_load(open(os.path.join(os.path.dirname(sys.argv[1]),
-                                                'meta.yaml')))
+        path = os.path.join(os.path.dirname(sys.argv[1]), 'meta.yaml')
+        return yaml.safe_load(open(path, encoding='utf-8'))
 
     @property
     def output(self):
@@ -94,10 +98,8 @@ class PLOT():
                     bbox_inches='tight',
                     pad_inches=self.PLOT_PAD_INCHES)
 
-    def test(self):
-        import matplotlib.plt as plt
-        import numpy as np
-
+    @staticmethod
+    def test():
         # data from https://allisonhorst.github.io/palmerpenguins/
 
         species = (

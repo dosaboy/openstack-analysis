@@ -1,0 +1,2 @@
+#!/bin/bash
+find $1 -name \*.sh| xargs bashate --verbose -i E043,E006

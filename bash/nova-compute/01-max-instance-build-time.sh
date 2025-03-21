@@ -15,6 +15,8 @@ process_log ()
     local CATCMD
     local MAX_JOBS=10
     local NUM_JOBS=0
+    local current=
+    local path=
 
     ensure_csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
@@ -31,10 +33,10 @@ process_log ()
         readarray -t ret<<<$($CATCMD $LOG| sed -rn "s/([0-9-]+) ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ nova.compute.manager \[req-[0-9a-z-]+ [0-9a-z-]+ $c .+\] Took ([0-9]+).[0-9]+ seconds to build instance./\20 \3/p")
         for t in "${ret[@]}"; do
             declare -a tt=( $t )
-            local path=${DATA_TMP}/${tt[0]//:/_}
-            local num=$(cat $path/$c)
+            path=${DATA_TMP}/${tt[0]//:/_}
+            current=$(cat $path/$c)
             # Store max build time
-            if ((${tt[1]} > $num)); then
+            if ((${tt[1]} > $current)); then
                 echo ${tt[1]} > $path/$c
             fi
             echo "1" > $flag

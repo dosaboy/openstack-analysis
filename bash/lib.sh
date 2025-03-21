@@ -45,9 +45,9 @@ cleanup ()
 {
     local tmpdir=$1
     local csv_file=$2
-    
+
     [[ -n $tmpdir ]] || { echo "ERROR!"; exit 1; }
-    
+
     rm -rf $tmpdir
     [[ -f $csv_file ]] && ls -al $csv_file
     if [[ -f $csv_file ]] && $(egrep -q "datetime,$" $csv_file); then
@@ -105,14 +105,15 @@ process_log ()
     local CSV_PATH=$3
     local CATEGORY_EXPR1="$4"
     local CATEGORY_EXPR2="$5"
-    local CATCMD
+    local CATCMD=cat
     local MAX_JOBS=10
     local NUM_JOBS=0
+    local current=
 
     #echo "Searching $LOG ($(wc -l $LOG))"
 
     ensure_csv_path
-    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
+    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat
 
     declare -a CATEGORY=( $(get_categories $CATCMD $LOG "$CATEGORY_EXPR1") )
     (( ${#CATEGORY[@]} )) || return
@@ -123,10 +124,11 @@ process_log ()
     echo "0" > $flag
     for c in ${CATEGORY[@]}; do
         ((NUM_JOBS+=1))
-        for t in $($CATCMD $LOG| sed -rn "$(eval echo \"$CATEGORY_EXPR2\")"); do
+        for t in $($CATCMD $LOG| \
+                    sed -rn "$(eval echo \"$CATEGORY_EXPR2\")"); do
             local path=${DATA_TMP}/${t//:/_}
-            local num=$(cat $path/$c)
-            echo $((num+1)) > $path/$c
+            current=$(cat $path/$c)
+            echo $((current+1)) > $path/$c
             echo "1" > $flag
         done &
         if ((NUM_JOBS==MAX_JOBS)); then

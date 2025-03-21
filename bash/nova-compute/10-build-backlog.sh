@@ -15,6 +15,11 @@ process_log ()
     local CATCMD
     local MAX_JOBS=10
     local NUM_JOBS=0
+    local current=
+    local path=
+    local vm=
+    local start=
+    local end=
 
     ensure_csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
@@ -57,10 +62,10 @@ process_log ()
 
     for vm in ${!BUILD_BACKLOGS[@]}; do
         t=${BUILD_ENDS_TIMES[$vm]}
-        local path=${DATA_TMP}/${t//:/_}
-        local num=$(cat $path/$key)
+        path=${DATA_TMP}/${t//:/_}
+        current=$(cat $path/$key)
         backlog=${BUILD_BACKLOGS[$vm]}
-        echo $((num+backlog)) > $path/$key
+        echo $((current+backlog)) > $path/$key
     done
     create_csv $CSV_PATH $DATA_TMP
 }

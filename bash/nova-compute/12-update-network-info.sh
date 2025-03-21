@@ -57,7 +57,7 @@ process_log ()
 
     for req in ${!UPDATE_STARTS[@]}; do
         [[ -n ${UPDATE_ENDS[$req]:-""} ]] || continue
-        info=( $(python3 $SCRIPT_ROOT/../python/date-check.py ${UPDATE_STARTS[$req]} ${UPDATE_ENDS[$req]}) )
+        info=( $(python3 $SCRIPT_ROOT/../python/datecheck.py ${UPDATE_STARTS[$req]} ${UPDATE_ENDS[$req]}) )
         ((${#info[@]})) || continue
         t=${info[0]}
         path=${DATA_TMP}/${t//:/_}
