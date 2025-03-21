@@ -11,9 +11,6 @@ module=nova.compute.manager
 e1="s/[0-9-]+ [0-9:.]+ [0-9]+ \w+ $module \[req-[0-9a-z-]+ ([0-9a-z-]+) ([0-9a-z-]+) .+\] .+ _do_build_and_run_instance .+/\2/p"
 e2="s/([0-9-]+) ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module \[req-[0-9a-z-]+ ([0-9a-z-]+) \$c .+\] .+ _do_build_and_run_instance .+/\20/p"
 
-FILTERED=$(mktemp -p $data_tmp)
-grep $module $LOG > $FILTERED
-process_log $FILTERED $data_tmp $csv_path "$e1" "$e2"
-
+process_log $(filter_log $LOG $module) $data_tmp $csv_path "$e1" "$e2"
 write_meta $results_dir time instance-creates
 cleanup $data_tmp $csv_path

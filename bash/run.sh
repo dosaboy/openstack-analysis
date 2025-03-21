@@ -22,7 +22,7 @@ for sos in $(ls -d $SOS_ROOT); do
         [[ -e $LOG ]] && $SCRIPT_ROOT/ovn/__all__.sh
     done
 
-    export LOG=$ROOT/var/log/octavia/octavia-worker.log.3.gz
+    export LOG=$ROOT/var/log/octavia/octavia-worker.log
     [[ -e $LOG ]] && $SCRIPT_ROOT/octavia/__all__.sh
 done
 

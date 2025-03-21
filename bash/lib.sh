@@ -232,3 +232,14 @@ get_results_dir ()
     mkdir -p $path
     echo $path
 }
+
+filter_log ()
+{
+    local path=$1
+    local filter="$2"
+    local filtered=
+
+    filtered=$(mktemp -p $data_tmp)
+    grep "$filter" $path > $filtered
+    echo $filtered
+}

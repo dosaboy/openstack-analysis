@@ -93,9 +93,6 @@ module=oslo_concurrency.lockutils
 e1="s/([0-9-]+) ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\3 \4/p"
 e2="s/([0-9-]+) ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"\$name\\\" .+ :: held ([0-9]+).[0-9]+s.+/\20/p"
 
-FILTERED=$(mktemp -p $data_tmp)
-grep $module $LOG > $FILTERED
-process_log $FILTERED $data_tmp $csv_path "$e1" "$e2"
-
+process_log $(filter_log $LOG $module) $data_tmp $csv_path "$e1" "$e2"
 write_meta $results_dir time lock-held-time
 cleanup $data_tmp $csv_path

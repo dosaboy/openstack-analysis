@@ -13,9 +13,6 @@ preamble_common="[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module \
 expr="s/$preamble_common Final resource view: name=\S+ phys_ram=[0-9]+MB used_ram=[0-9]+MB phys_disk=[0-9]+GB used_disk=[0-9]+GB total_vcpus=([0-9]+) used_vcpus=([0-9]+) .+/\10 \3 \4/p"
 keys=( total_vcpus used_vcpus )
 
-FILTERED=$(mktemp -p $data_tmp)
-grep $module $LOG > $FILTERED
-process_log_simple $FILTERED $data_tmp $csv_path "$expr" ${keys[@]}
-
+process_log_simple $(filter_log $LOG $module) $data_tmp $csv_path "$expr" ${keys[@]}
 write_meta $results_dir time num-vcpus
 cleanup $data_tmp $csv_path

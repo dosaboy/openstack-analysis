@@ -73,10 +73,7 @@ data_tmp=`mktemp -d -p $results_dir`
 csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
 module=nova.compute.manager
 
-FILTERED=$(mktemp -p $data_tmp)
-grep $module $LOG > $FILTERED
-process_log $FILTERED $data_tmp $csv_path
-
+process_log $(filter_log $LOG $module) $data_tmp $csv_path
 write_meta $results_dir time instance-build-backlog-size
 cleanup $data_tmp $csv_path
 
