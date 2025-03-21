@@ -3,8 +3,6 @@
 # Description: capture amount of time nova-compute locks are held for.
 #
 . $SCRIPT_ROOT/lib.sh
-RESULTS_DIR=results_data/$(basename $0| sed -r 's/[0-9]+-(.+)\.sh/\1/'| tr '-' '_')
-mkdir -p $RESULTS_DIR
 
 is_uuid ()
 {
@@ -88,9 +86,9 @@ process_log ()
     rm $flag
 }
 
-
-data_tmp=`mktemp -d -p $RESULTS_DIR`
-csv_path=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
+results_dir=$(get_results_dir)
+data_tmp=`mktemp -d -p $results_dir`
+csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
 module=oslo_concurrency.lockutils
 e1="s/([0-9-]+) ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\3 \4/p"
 e2="s/([0-9-]+) ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"\$name\\\" .+ :: held ([0-9]+).[0-9]+s.+/\20/p"
@@ -99,5 +97,5 @@ FILTERED=$(mktemp -p $data_tmp)
 grep $module $LOG > $FILTERED
 process_log $FILTERED $data_tmp $csv_path "$e1" "$e2"
 
-write_meta $RESULTS_DIR time lock-held-time
+write_meta $results_dir time lock-held-time
 cleanup $data_tmp $csv_path

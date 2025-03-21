@@ -3,9 +3,6 @@
 # Description: capture max amount of time taken to build instances.
 #
 . $SCRIPT_ROOT/lib.sh
-SCRIPT_NAME=$(basename $0| sed -r 's/[0-9]+-(.+)\.sh/\1/'| tr '-' '_')
-RESULTS_DIR=results_data/$SCRIPT_NAME
-mkdir -p $RESULTS_DIR
 
 process_log ()
 {
@@ -51,13 +48,14 @@ process_log ()
     rm $flag
 }
 
-data_tmp=`mktemp -d -p $RESULTS_DIR`
-csv_path=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
+results_dir=$(get_results_dir)
+data_tmp=`mktemp -d -p $results_dir`
+csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
 module=nova.compute.manager
 
 FILTERED=$(mktemp -p $data_tmp)
 grep $module $LOG > $FILTERED
 process_log $FILTERED $data_tmp $csv_path
 
-write_meta $RESULTS_DIR time instance-build-time
+write_meta $results_dir time instance-build-time
 cleanup $data_tmp $csv_path

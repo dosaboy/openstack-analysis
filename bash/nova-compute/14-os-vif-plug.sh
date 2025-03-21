@@ -3,9 +3,6 @@
 # Description: capture time taken to allocate network resources for new vm.
 #
 . $SCRIPT_ROOT/lib.sh
-SCRIPT_NAME=$(basename $0| sed -r 's/[0-9]+-(.+)\.sh/\1/'| tr '-' '_')
-RESULTS_DIR=results_data/$SCRIPT_NAME
-mkdir -p $RESULTS_DIR
 
 process_log ()
 {
@@ -47,7 +44,7 @@ process_log ()
         UPDATE_ENDS[$req]=$ends
     done
 
-    local key=$SCRIPT_NAME
+    local key=$(get_script_name)
     init_dataset $DATA_TMP "" ${key}_max
 
     local current=
@@ -66,8 +63,9 @@ process_log ()
     create_csv $CSV_PATH $DATA_TMP
 }
 
-data_tmp=`mktemp -d -p $RESULTS_DIR`
-csv_path=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
+results_dir=$(get_results_dir)
+data_tmp=`mktemp -d -p $results_dir`
+csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
 module=os_vif
 preamble_common="[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module \[req-[0-9a-z-]+ ([0-9a-z-]+) ([0-9a-z-]+) .+\]"
 e1="s/$preamble_common Plugging vif .+/\0/p"
@@ -77,5 +75,5 @@ FILTERED=$(mktemp -p $data_tmp)
 grep $module $LOG > $FILTERED
 process_log $FILTERED $data_tmp $csv_path "$e1" "$e2"
 
-write_meta $RESULTS_DIR time os-vif-plug-time
+write_meta $results_dir time os-vif-plug-time
 cleanup $data_tmp $csv_path

@@ -3,12 +3,10 @@
 # Description: capture resource tracking for vcpu usage
 #
 . $SCRIPT_ROOT/lib.sh
-SCRIPT_NAME=$(basename $0| sed -r 's/[0-9]+-(.+)\.sh/\1/'| tr '-' '_')
-RESULTS_DIR=results_data/$SCRIPT_NAME
-mkdir -p $RESULTS_DIR
 
-data_tmp=`mktemp -d -p $RESULTS_DIR`
-csv_path=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
+results_dir=$(get_results_dir)
+data_tmp=`mktemp -d -p $results_dir`
+csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
 
 module=nova.compute.resource_tracker
 preamble_common="[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module \[(\S+ ?){6}\]"
@@ -19,5 +17,5 @@ FILTERED=$(mktemp -p $data_tmp)
 grep $module $LOG > $FILTERED
 process_log_simple $FILTERED $data_tmp $csv_path "$expr" ${keys[@]}
 
-write_meta $RESULTS_DIR time num-vcpus
+write_meta $results_dir time num-vcpus
 cleanup $data_tmp $csv_path

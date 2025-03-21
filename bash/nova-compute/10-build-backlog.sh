@@ -4,8 +4,6 @@
 #              processes while building a new vm.
 #
 . $SCRIPT_ROOT/lib.sh
-RESULTS_DIR=results_data/$(basename $0| sed -r 's/[0-9]+-(.+)\.sh/\1/'| tr '-' '_')
-mkdir -p $RESULTS_DIR
 
 process_log ()
 {
@@ -70,14 +68,15 @@ process_log ()
     create_csv $CSV_PATH $DATA_TMP
 }
 
-data_tmp=`mktemp -d -p $RESULTS_DIR`
-csv_path=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
+results_dir=$(get_results_dir)
+data_tmp=`mktemp -d -p $results_dir`
+csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
 module=nova.compute.manager
 
 FILTERED=$(mktemp -p $data_tmp)
 grep $module $LOG > $FILTERED
 process_log $FILTERED $data_tmp $csv_path
 
-write_meta $RESULTS_DIR time instance-build-backlog-size
+write_meta $results_dir time instance-build-backlog-size
 cleanup $data_tmp $csv_path
 

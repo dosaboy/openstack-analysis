@@ -180,3 +180,17 @@ write_meta ()
     echo -e "xlabel: $X_LABEL\nylabel: $Y_LABEL\n" > ${DOUT}/meta.yaml
 }
 
+get_script_name ()
+{
+    basename $0| sed -r 's/[0-9]+-(.+)\.sh/\1/'| tr '-' '_'
+}
+
+get_results_dir ()
+{
+    local mod_name=$(basename $(dirname $0))
+    local script_name=$(get_script_name)
+    local path=results_data/${mod_name}/$script_name
+
+    mkdir -p $path
+    echo $path
+}
