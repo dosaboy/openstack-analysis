@@ -16,6 +16,14 @@ for sos in $(ls -d $SOS_ROOT); do
 
     export LOG=$ROOT/var/log/neutron/neutron-server.log
     [[ -e $LOG ]] && $SCRIPT_ROOT/neutron-api/__all__.sh
+
+    for f in openvswitch/ovsdb-server.log ovn/ovsdb-server-nb.log ovn/ovsdb-server-sb.log; do
+        export LOG=$ROOT/var/log/$f
+        [[ -e $LOG ]] && $SCRIPT_ROOT/ovn/__all__.sh
+    done
+
+    export LOG=$ROOT/var/log/octavia/octavia-worker.log.3.gz
+    [[ -e $LOG ]] && $SCRIPT_ROOT/octavia/__all__.sh
 done
 
 $PLOT_GRAPHS || exit 0

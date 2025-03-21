@@ -100,6 +100,7 @@ ensure_csv_path ()
 
 process_log ()
 {
+    (($#>=5)) || { echo "ERROR: insufficient args to process_log()"; exit 1; }
     local LOG=$1
     local DATA_TMP=$2
     local CSV_PATH=$3
@@ -144,6 +145,7 @@ process_log ()
 
 process_log_simple ()
 {
+    (($#>4)) || { echo "ERROR: insufficient args to process_log_simple()"; exit 1; }
     local LOG=$1
     local DATA_TMP=$2
     local CSV_PATH=$3
@@ -171,6 +173,38 @@ process_log_simple ()
 }
 
 
+process_log_tally ()
+{
+    (($#>4)) || { echo "ERROR: insufficient args to process_log_simple()"; exit 1; }
+    local LOG=$1
+    local DATA_TMP=$2
+    local CSV_PATH=$3
+    local EXPR1="$4"
+    shift 4
+    local KEYS=( $@ )
+    local CATCMD=cat
+    local current=
+
+    ensure_csv_path
+    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat
+
+    readarray -t rows<<<$(get_categories $CATCMD $LOG "$EXPR1")
+    (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || return
+
+    init_dataset $DATA_TMP "" ${KEYS[@]}
+    for entry in "${rows[@]}"; do
+        declare -a info=( $entry )
+        t=${info[0]}
+        path=${DATA_TMP}/${t//:/_}
+        for ((i=1; i<=${#KEYS[@]}; i+=1)); do
+            current=$(cat $path/${KEYS[$((i-1))]})
+            echo "$((current + 1))" > $path/${KEYS[$((i-1))]}
+        done
+    done
+    create_csv $CSV_PATH $DATA_TMP
+}
+
+
 write_meta ()
 {
     local DOUT=$1
@@ -187,9 +221,13 @@ get_script_name ()
 
 get_results_dir ()
 {
-    local mod_name=$(basename $(dirname $0))
-    local script_name=$(get_script_name)
-    local path=results_data/${mod_name}/$script_name
+    local mod_name=
+    local script_name=
+    local path=
+
+    mod_name=$(basename $(dirname $0))
+    script_name=$(get_script_name)
+    path=results_data/${mod_name}/$script_name
 
     mkdir -p $path
     echo $path

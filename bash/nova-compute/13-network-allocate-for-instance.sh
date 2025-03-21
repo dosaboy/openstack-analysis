@@ -12,6 +12,9 @@ process_log ()
     local CATCMD
     local MAX_JOBS=10
     local NUM_JOBS=0
+    local key=
+    local current=
+    local path=
 
     ensure_csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
@@ -46,12 +49,8 @@ process_log ()
         UPDATE_ENDS[$req]=$ends
     done
 
-    local key=$(get_script_name)
+    key=$(get_script_name)
     init_dataset $DATA_TMP "" ${key}_max
-
-    local current=
-    local path=
-
     for req in ${!UPDATE_STARTS[@]}; do
         [[ -n ${UPDATE_ENDS[$req]:-""} ]] || continue
         info=( $(python3 $SCRIPT_ROOT/../python/datecheck.py ${UPDATE_STARTS[$req]} ${UPDATE_ENDS[$req]}) )
