@@ -143,6 +143,52 @@ process_log ()
 }
 
 
+process_log_max ()
+{
+    local LOG=$1
+    local DATA_TMP=$2
+    local CSV_PATH=$3
+    local EXPR1="$4"
+    local EXPR2="$5"
+    local CATCMD
+    local MAX_JOBS=10
+    local NUM_JOBS=0
+    local current=
+    local path=
+
+    ensure_csv_path
+    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
+
+    declare -a CATEGORIES=( $(get_categories $CATCMD $LOG "$EXPR1") )
+    (( ${#CATEGORIES[@]} )) || return
+
+    init_dataset $DATA_TMP "" ${CATEGORIES[@]}
+    flag=$(mktemp)
+    echo "0" > $flag
+    for c in ${CATEGORIES[@]}; do
+        ((NUM_JOBS+=1))
+        readarray -t ret<<<$($CATCMD $LOG| sed -rn "$(eval echo \"$EXPR2\")")
+        for t in "${ret[@]}"; do
+            declare -a tt=( $t )
+            path=${DATA_TMP}/${tt[0]//:/_}
+            current=$(cat $path/$c)
+            # Store max
+            if ((${tt[1]} > $current)); then
+                echo ${tt[1]} > $path/$c
+            fi
+            echo "1" > $flag
+        done &
+        if ((NUM_JOBS==MAX_JOBS)); then
+            wait
+            NUM_JOBS=0
+        fi
+    done
+    wait
+    (($(cat $flag)==1)) && create_csv $CSV_PATH $DATA_TMP
+    rm $flag
+}
+
+
 process_log_simple ()
 {
     (($#>4)) || { echo "ERROR: insufficient args to process_log_simple()"; exit 1; }
