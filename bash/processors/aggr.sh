@@ -29,7 +29,9 @@ process_log_aggr ()
         (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || continue
         for row in "${rows[@]}"; do
             declare -a split=( $row )
-            path=${data_tmp}/${split[0]//:/_}
+            # round to nearest 10 minutes
+            t=${split[0]::4}0
+            path=${data_tmp}/${t//:/_}
             current=$(cat $path/$c)
             echo $((current+1)) > $path/$c
             echo "1" > $flag

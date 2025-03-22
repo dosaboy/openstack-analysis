@@ -12,6 +12,7 @@ process_log_deltas ()
     local label=
     local current=
     local path=
+    declare -A tsdates=()
     declare -A range_starts=()
     declare -A range_ends=()
 
@@ -27,22 +28,26 @@ process_log_deltas ()
     (( ${#ends[@]} )) && [[ -n ${ends[0]} ]] || return
 
     for line in "${starts[@]}"; do
-        info=( $(echo "$line"| sed -rn "s/$cols_expr/\1 \2/p") )
+        info=( $(echo "$line"| sed -rn "s/$cols_expr/\1_\2 \3/p") )
         start=${info[0]}
         resource=${info[1]}
         [[ ${range_starts[$resource]:-null} = null ]] || echo "WARNING: resource $resource found more than once"
         range_starts[$resource]=$start
+        _date=$(echo $start|egrep -o "^([0-9-]+)")
+        tsdates[$_date]=true
     done
 
     for line in "${ends[@]}"; do
-        info=( $(echo "$line"| sed -rn "s/$rows_expr/\1 \3/p") )
+        info=( $(echo "$line"| sed -rn "s/$rows_expr/\1_\2 \4/p") )
         ends=${info[0]}
         resource=${info[1]}
         range_ends[$resource]=$ends
     done
 
     label=$(get_script_name)_deltas
-    init_dataset $data_tmp "" $label
+    for tsdate in ${!tsdates[@]}; do
+        init_dataset $data_tmp "$tsdate" $label
+    done
     for resource in ${!range_starts[@]}; do
         [[ -n ${range_ends[$resource]:-""} ]] || continue
         info=( $(python3 $SCRIPT_ROOT/../python/datecheck.py \

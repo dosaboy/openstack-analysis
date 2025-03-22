@@ -21,7 +21,8 @@ process_log_simple ()
     init_dataset $data_tmp "" ${cols[@]}
     for entry in "${rows[@]}"; do
         declare -a info=( $entry )
-        t=${info[0]}
+        # round to nearest 10 minutes
+        t=${info[0]::4}0
         path=${data_tmp}/${t//:/_}
         for ((i=1; i<=${#cols[@]}; i+=1)); do
             echo "${info[$i]}" > $path/${cols[$((i-1))]}
