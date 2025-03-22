@@ -11,6 +11,6 @@ module=nova.compute.manager
 e1="s/[0-9-]+ [0-9:.]+ [0-9]+ \w+ $module \[req-[0-9a-z-]+ [0-9a-z-]+ ([0-9a-z-]+) .+\] .+ _do_build_and_run_instance .+/\1/p"
 e2="s/[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module \[req-[0-9a-z-]+ ([0-9a-z-]+) \$c .+\] .+ _do_build_and_run_instance .+/\10/p"
 
-process_log $(filter_log $LOG $module) $data_tmp $csv_path "$e1" "$e2"
+process_log_aggr $(filter_log $LOG $module) $data_tmp $csv_path "$e1" "$e2"
 write_meta $results_dir time instance-creates
 cleanup $data_tmp $csv_path

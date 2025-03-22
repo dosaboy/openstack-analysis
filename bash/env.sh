@@ -5,6 +5,7 @@ export OVERWRITE_CSV=false
 export HOST_OVERRIDE=
 export SOS_ROOT=
 export PLOT_GRAPHS=false
+export OUTPUT_PATH=results
 
 while (($# > 0)); do
     case "$1" in

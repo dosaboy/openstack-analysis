@@ -27,4 +27,4 @@ for sos in $(ls -d $SOS_ROOT); do
 done
 
 $PLOT_GRAPHS || exit 0
-$SCRIPT_ROOT/plot.sh $HOST_OVERRIDE
+$SCRIPT_ROOT/plot.sh --host "$HOST_OVERRIDE"

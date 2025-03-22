@@ -9,7 +9,7 @@ process_log ()
 {
     local LOG=$1
     local DATA_TMP=$2
-    local CSV_PATH=$3
+    local csv_path=$3
     local CATCMD
     local MAX_JOBS=10
     local NUM_JOBS=0
@@ -19,7 +19,7 @@ process_log ()
     local start=
     local end=
 
-    ensure_csv_path
+    ensure_csv_path $csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
     e1='s/[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ nova.compute.manager \[req-[0-9a-z-]+ ([0-9a-z-]+) ([0-9a-z-]+) .+\] \[instance: ([0-9a-z-]+)\] Took [0-9.]+ seconds to build instance./\0/p'
@@ -65,7 +65,7 @@ process_log ()
         backlog=${BUILD_BACKLOGS[$vm]}
         echo $((current+backlog)) > $path/$key
     done
-    create_csv $CSV_PATH $DATA_TMP
+    create_csv $csv_path $DATA_TMP
 }
 
 results_dir=$(get_results_dir)

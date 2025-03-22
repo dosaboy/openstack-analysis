@@ -13,6 +13,6 @@ preamble_common="[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module \
 expr1="s,$preamble_common \"(GET|POST|HEAD|DELETE|PUT) /[a-z0-9.]+/[^/]+\?.*[/ ].+\" status: ([0-9]+) .+,\4,p"
 expr2="s,$preamble_common \\\"(GET|POST|HEAD|DELETE|PUT) /[a-z0-9.]+/[^/]+\?.*[/ ].+\\\" status: \$c .+,\10,p"
 
-process_log $(filter_log $LOG $module) $data_tmp $csv_path "$expr1" "$expr2"
+process_log_aggr $(filter_log $LOG $module) $data_tmp $csv_path "$expr1" "$expr2"
 write_meta $results_dir time http-return-codes
 cleanup $data_tmp $csv_path

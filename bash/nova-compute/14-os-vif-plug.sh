@@ -8,7 +8,7 @@ process_log ()
 {
     local LOG=$1
     local DATA_TMP=$2
-    local CSV_PATH=$3
+    local csv_path=$3
     local EXPR1="$4"
     local EXPR2="$5"
     local CATCMD
@@ -18,7 +18,7 @@ process_log ()
     local current=
     local path=
 
-    ensure_csv_path
+    ensure_csv_path $csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
     # NOTE: exclude service thread
@@ -59,7 +59,7 @@ process_log ()
         ((current<${info[1]})) || continue
         echo ${info[1]} > $path/${key}_max
     done
-    create_csv $CSV_PATH $DATA_TMP
+    create_csv $csv_path $DATA_TMP
 }
 
 results_dir=$(get_results_dir)

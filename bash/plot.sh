@@ -1,15 +1,23 @@
 #!/bin/bash -eu
 SCRIPT_ROOT=$(dirname $(readlink --canonicalize $0))
-HOST_OVERRIDE=${1:-""}
+. $SCRIPT_ROOT/env.sh
+DATA_PATH=$OUTPUT_PATH/data
+GRAPHS_PATH=$OUTPUT_PATH/graphs
+PYTHON_SCRIPTS=$SCRIPT_ROOT/../python
+
+if ! [[ -d $DATA_PATH ]]; then
+    echo "INFO: no data found to plot"
+    exit 1
+fi
 
 echo "Plotting graphs..."
 if [[ -n $HOST_OVERRIDE ]]; then
-    rm graphs/$HOST_OVERRIDE/*
-    find results_data -name \*.csv| grep $HOST_OVERRIDE| \
-        xargs -l python3 $SCRIPT_ROOT/../python/plot.py
+    rm $GRAPHS_PATH/$HOST_OVERRIDE/*
+    find $DATA_PATH -name \*.csv| grep $HOST_OVERRIDE| \
+        xargs -l python3 $PYTHON_SCRIPTS/plot.py
 else
-    rm -rf graphs/*
-    find results_data -name \*.csv| \
-        xargs -l python3 $SCRIPT_ROOT/../python/plot.py
+    rm -rf $GRAPHS_PATH/*
+    find $DATA_PATH -name \*.csv| \
+        xargs -l python3 $PYTHON_SCRIPTS/plot.py
 fi
 

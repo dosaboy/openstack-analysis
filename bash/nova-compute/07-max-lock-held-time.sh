@@ -20,14 +20,14 @@ process_log ()
 {
     local LOG=$1
     local DATA_TMP=$2
-    local CSV_PATH=$3
+    local csv_path=$3
     local CATEGORY_EXPR1="$4"
     local CATEGORY_EXPR2="$5"
     local CATCMD
     local MAX_JOBS=10
     local NUM_JOBS=0
 
-    ensure_csv_path
+    ensure_csv_path $csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
     readarray -t CATEGORY<<<$($CATCMD $LOG| sed -rn "$CATEGORY_EXPR1"| sort -u)
@@ -82,7 +82,7 @@ process_log ()
         fi
     done
     wait
-    (($(cat $flag)==1)) && create_csv $CSV_PATH $DATA_TMP
+    (($(cat $flag)==1)) && create_csv $csv_path $DATA_TMP
     rm $flag
 }
 

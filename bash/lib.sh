@@ -88,168 +88,17 @@ get_categories ()
 
 ensure_csv_path ()
 {
-    if [[ -e $CSV_PATH ]]; then
+    local path=$1
+
+    if [[ -e $path ]]; then
         if ! $OVERWRITE_CSV; then
-            echo "$CSV_PATH already exists and overwrite=false - skipping"
+            echo "$path already exists and overwrite=false - skipping"
             exit 0
         fi
 
-        rm -f $CSV_PATH
+        rm -f $path
     fi
 }
-
-process_log ()
-{
-    (($#>=5)) || { echo "ERROR: insufficient args to process_log()"; exit 1; }
-    local LOG=$1
-    local DATA_TMP=$2
-    local CSV_PATH=$3
-    local CATEGORY_EXPR1="$4"
-    local CATEGORY_EXPR2="$5"
-    local CATCMD=cat
-    local MAX_JOBS=10
-    local NUM_JOBS=0
-    local current=
-
-    #echo "Searching $LOG ($(wc -l $LOG))"
-
-    ensure_csv_path
-    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat
-
-    declare -a CATEGORY=( $(get_categories $CATCMD $LOG "$CATEGORY_EXPR1") )
-    (( ${#CATEGORY[@]} )) || return
-
-    init_dataset $DATA_TMP "" ${CATEGORY[@]}
-
-    flag=$(mktemp)
-    echo "0" > $flag
-    for c in ${CATEGORY[@]}; do
-        ((NUM_JOBS+=1))
-        for t in $($CATCMD $LOG| \
-                    sed -rn "$(eval echo \"$CATEGORY_EXPR2\")"); do
-            local path=${DATA_TMP}/${t//:/_}
-            current=$(cat $path/$c)
-            echo $((current+1)) > $path/$c
-            echo "1" > $flag
-        done &
-        if ((NUM_JOBS==MAX_JOBS)); then
-            wait
-            NUM_JOBS=0
-        fi
-    done
-    wait
-    (($(cat $flag)==1)) && create_csv $CSV_PATH $DATA_TMP
-    rm $flag
-}
-
-
-process_log_max ()
-{
-    local LOG=$1
-    local DATA_TMP=$2
-    local CSV_PATH=$3
-    local EXPR1="$4"
-    local EXPR2="$5"
-    local CATCMD
-    local MAX_JOBS=10
-    local NUM_JOBS=0
-    local current=
-    local path=
-
-    ensure_csv_path
-    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
-
-    declare -a CATEGORIES=( $(get_categories $CATCMD $LOG "$EXPR1") )
-    (( ${#CATEGORIES[@]} )) || return
-
-    init_dataset $DATA_TMP "" ${CATEGORIES[@]}
-    flag=$(mktemp)
-    echo "0" > $flag
-    for c in ${CATEGORIES[@]}; do
-        ((NUM_JOBS+=1))
-        readarray -t ret<<<$($CATCMD $LOG| sed -rn "$(eval echo \"$EXPR2\")")
-        for t in "${ret[@]}"; do
-            declare -a tt=( $t )
-            path=${DATA_TMP}/${tt[0]//:/_}
-            current=$(cat $path/$c)
-            # Store max
-            if ((${tt[1]} > $current)); then
-                echo ${tt[1]} > $path/$c
-            fi
-            echo "1" > $flag
-        done &
-        if ((NUM_JOBS==MAX_JOBS)); then
-            wait
-            NUM_JOBS=0
-        fi
-    done
-    wait
-    (($(cat $flag)==1)) && create_csv $CSV_PATH $DATA_TMP
-    rm $flag
-}
-
-
-process_log_simple ()
-{
-    (($#>4)) || { echo "ERROR: insufficient args to process_log_simple()"; exit 1; }
-    local LOG=$1
-    local DATA_TMP=$2
-    local CSV_PATH=$3
-    local EXPR1="$4"
-    shift 4
-    local KEYS=( $@ )
-    local CATCMD=cat
-
-    ensure_csv_path
-    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat
-
-    readarray -t rows<<<$(get_categories $CATCMD $LOG "$EXPR1")
-    (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || return
-
-    init_dataset $DATA_TMP "" ${KEYS[@]}
-    for entry in "${rows[@]}"; do
-        declare -a info=( $entry )
-        t=${info[0]}
-        path=${DATA_TMP}/${t//:/_}
-        for ((i=1; i<=${#KEYS[@]}; i+=1)); do
-            echo "${info[$i]}" > $path/${KEYS[$((i-1))]}
-        done
-    done
-    create_csv $CSV_PATH $DATA_TMP
-}
-
-
-process_log_tally ()
-{
-    (($#>4)) || { echo "ERROR: insufficient args to process_log_simple()"; exit 1; }
-    local LOG=$1
-    local DATA_TMP=$2
-    local CSV_PATH=$3
-    local EXPR1="$4"
-    shift 4
-    local KEYS=( $@ )
-    local CATCMD=cat
-    local current=
-
-    ensure_csv_path
-    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat
-
-    readarray -t rows<<<$(get_categories $CATCMD $LOG "$EXPR1")
-    (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || return
-
-    init_dataset $DATA_TMP "" ${KEYS[@]}
-    for entry in "${rows[@]}"; do
-        declare -a info=( $entry )
-        t=${info[0]}
-        path=${DATA_TMP}/${t//:/_}
-        for ((i=1; i<=${#KEYS[@]}; i+=1)); do
-            current=$(cat $path/${KEYS[$((i-1))]})
-            echo "$((current + 1))" > $path/${KEYS[$((i-1))]}
-        done
-    done
-    create_csv $CSV_PATH $DATA_TMP
-}
-
 
 write_meta ()
 {
@@ -273,7 +122,7 @@ get_results_dir ()
 
     mod_name=$(basename $(dirname $0))
     script_name=$(get_script_name)
-    path=results_data/${mod_name}/$script_name
+    path=$OUTPUT_PATH/data/$mod_name/$script_name
 
     mkdir -p $path
     echo $path
@@ -291,3 +140,8 @@ filter_log ()
     $cmd "$filter" $path > $filtered
     echo $filtered
 }
+
+# Load processors
+for processor in ${SCRIPT_ROOT}/processors/*; do
+    . $processor
+done

@@ -8,7 +8,7 @@ process_log ()
 {
     local LOG=$1
     local DATA_TMP=$2
-    local CSV_PATH=$3
+    local csv_path=$3
     local CATCMD
     local MAX_JOBS=10
     local NUM_JOBS=0
@@ -16,7 +16,7 @@ process_log ()
     local current=
     local path=
 
-    ensure_csv_path
+    ensure_csv_path $csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
     preamble_common='[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ nova.network.neutron \[req-[0-9a-z-]+ ([0-9a-z-]+) ([0-9a-z-]+) .+\] \[instance: ([0-9a-z-]+)\]'
@@ -61,7 +61,7 @@ process_log ()
         ((current<${info[1]})) || continue
         echo ${info[1]} > $path/${key}_max
     done
-    create_csv $CSV_PATH $DATA_TMP
+    create_csv $csv_path $DATA_TMP
 }
 
 results_dir=$(get_results_dir)

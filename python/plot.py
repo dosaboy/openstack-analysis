@@ -50,7 +50,8 @@ class PLOT():
 
     @property
     def output_dir(self):
-        dpath = os.path.join('graphs', self.name.partition('_')[0])
+        dpath = os.environ['OUTPUT_PATH']
+        dpath = os.path.join(dpath, 'graphs', self.name.partition('_')[0])
         if not os.path.exists(dpath):
             os.makedirs(dpath)
 
