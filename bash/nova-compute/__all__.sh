@@ -18,4 +18,5 @@ $__ROOT__/14-os-vif-plug.sh &
 $__ROOT__/15-resource-tracker-vcpus.sh &
 $__ROOT__/15-resource-tracker-memory.sh &
 $__ROOT__/15-resource-tracker-disk.sh &
+$__ROOT__/16-network-vif-plugged-timeout.sh &
 wait

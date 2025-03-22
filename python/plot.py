@@ -77,16 +77,22 @@ class PLOT():
         stacked = []
         labels = []
         x = []
-        for d in data['datetime']:
-            try:
-                x.append(datetime.datetime.strptime(d, "%H:%M"))
-            except ValueError:
-                x.append(datetime.datetime.strptime(d, '%Y-%m-%d:%H:%M'))
+        try:
+            a = np.datetime64(f"{data['datetime'].values[0]}:00")
+            b = np.datetime64(f"{data['datetime'].values[-1]}:00")
+        except ValueError:
+            a = np.datetime64(f"2025-01-01T{data['datetime'].values[0]}:00")
+            b = np.datetime64(f"2025-01-01T{data['datetime'].values[-1]}:00")
 
-        for key, val in data.items():
-            if key != 'datetime':
-                labels.append(key)
-                stacked.append([int(e) for e in val])
+        b += np.timedelta64(10, 'm')
+        x = np.arange(a, b, np.timedelta64(10, 'm'))
+
+        for key in data:
+            if key == 'datetime':
+                continue
+
+            labels.append(key)
+            stacked.append(data[key].values)
 
         ax.stackplot(x, stacked, labels=labels)
         plt.xlabel(self.meta['xlabel'])
