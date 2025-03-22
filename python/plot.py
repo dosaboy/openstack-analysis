@@ -87,12 +87,16 @@ class PLOT():
         b += np.timedelta64(10, 'm')
         x = np.arange(a, b, np.timedelta64(10, 'm'))
 
+        # bottom = np.zeros(len(data['datetime']))
         for key in data:
             if key == 'datetime':
                 continue
 
             labels.append(key)
-            stacked.append(data[key].values)
+            stacked.append(data[key])
+            # width = 0.5
+            # ax.bar(x, data[key], width, label=key, bottom=bottom)
+            # bottom += data[key]
 
         ax.stackplot(x, stacked, labels=labels)
         plt.xlabel(self.meta['xlabel'])
