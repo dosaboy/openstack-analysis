@@ -28,19 +28,20 @@ process_log_deltas ()
     (( ${#ends[@]} )) && [[ -n ${ends[0]} ]] || return
 
     for line in "${starts[@]}"; do
-        info=( $(echo "$line"| sed -rn "s/$cols_expr/\1_\2 \3/p") )
+        info=( $(echo "$line"| sed -rn "s/$cols_expr/\1T\2 \3/p") )
         start=${info[0]}
         resource=${info[1]}
-        [[ ${range_starts[$resource]:-null} = null ]] || echo "WARNING: resource $resource found more than once"
+        [[ ${range_starts[$resource]:-null} = null ]] || echo "WARNING: resource $resource found more than once - overwriting"
         range_starts[$resource]=$start
         _date=$(echo $start|egrep -o "^([0-9-]+)")
         tsdates[$_date]=true
     done
 
     for line in "${ends[@]}"; do
-        info=( $(echo "$line"| sed -rn "s/$rows_expr/\1_\2 \4/p") )
+        info=( $(echo "$line"| sed -rn "s/$rows_expr/\1T\2 \3/p") )
         ends=${info[0]}
         resource=${info[1]}
+        [[ ${range_ends[$resource]:-null} = null ]] || echo "WARNING: resource $resource end found more than once - overwriting"
         range_ends[$resource]=$ends
     done
 

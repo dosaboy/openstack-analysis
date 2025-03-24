@@ -13,7 +13,8 @@ _init_time ()
     ((hour<10)) && hour="0$hour"
 
     if [[ -n $date ]]; then
-        prefix=${date}_
+        # keep date in iso-8601 format
+        prefix=${date}T
     fi
 
     ((min % 10)) && return
@@ -132,12 +133,17 @@ filter_log ()
 {
     local path=$1
     local filter="$2"
+    local reverse=${3:-false}
     local filtered=
-    local cmd=grep
+    local cmd=egrep
 
-    file --mime-type $path| grep -q application/gzip && cmd=zgrep
+    file --mime-type $path| grep -q application/gzip && cmd=zegrep
     filtered=$(mktemp -p $data_tmp)
-    $cmd "$filter" $path > $filtered
+    if $reverse; then
+        $cmd -v "$filter" $path > $filtered
+    else
+        $cmd "$filter" $path > $filtered
+    fi
     echo $filtered
 }
 

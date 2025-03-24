@@ -90,9 +90,10 @@ results_dir=$(get_results_dir)
 data_tmp=`mktemp -d -p $results_dir`
 csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
 module=oslo_concurrency.lockutils
-e1="s/[0-9-]+ [0-9:]+:[0-9][0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
-e2="s/[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\10/p"
+y_label=max-lock-held-time
+expr1="s/[0-9-]+ [0-9:]+:[0-9][0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
+expr2="s/[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\10/p"
 
-process_log $(filter_log $LOG $module) $data_tmp $csv_path "$e1" "$e2"
-write_meta $results_dir time lock-held-time
+process_log $(filter_log $LOG $module) $data_tmp $csv_path "$expr1" "$expr2"
+write_meta $results_dir time $y_label
 cleanup $data_tmp $csv_path
