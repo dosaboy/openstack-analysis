@@ -4,15 +4,16 @@
 #
 . $SCRIPT_ROOT/lib.sh
 
+MODULE=nova.network.neutron
+. $SCRIPT_ROOT/log_expressions.sh
+
 results_dir=$(get_results_dir)
 data_tmp=`mktemp -d -p $results_dir`
 csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
-module=nova.network.neutron
 y_label=net-info-cache-update-time
-preamble_common="^([0-9-]+) ([0-9:]+{3})\.[0-9]+ [0-9]+ \w+ $module \[req-([0-9a-z-]+) [0-9a-z -]+{5}\] \[instance: [0-9a-z-]+\]"
-expr1="$preamble_common allocate_for_instance\(\) allocate_for_instance .+"
-expr2="$preamble_common Updating instance_info_cache with network_info:.+"
-filtered=$(filter_log $LOG "$module")
+expr1="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ $EXPR_LOG_INSTANCE_UUID allocate_for_instance\(\) allocate_for_instance .+"
+expr2="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ $EXPR_LOG_INSTANCE_UUID Updating instance_info_cache with network_info:.+"
+filtered=$(filter_log $LOG "$MODULE")
 # filter out updates done by the compute servive itself
 filtered=$(filter_log $filtered "(\- - - - -\])|\[-\]" true)
 

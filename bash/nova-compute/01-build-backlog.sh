@@ -5,6 +5,10 @@
 #
 . $SCRIPT_ROOT/lib.sh
 
+MODULE=nova.compute.manager
+. $SCRIPT_ROOT/log_expressions.sh
+
+
 process_log ()
 {
     local LOG=$1
@@ -22,7 +26,7 @@ process_log ()
     ensure_csv_path $csv_path
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
-    e1='s/[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ nova.compute.manager \[req-[0-9a-z-]+ ([0-9a-z-]+) ([0-9a-z-]+) .+\] \[instance: ([0-9a-z-]+)\] Took [0-9.]+ seconds to build instance./\0/p'
+    e1="s/$EXPR_LOG_DATE $EXPR_LOG_CONTEXT $EXPR_LOG_INSTANCE_UUID Took [0-9.]+ seconds to build instance./\0/p"
     readarray -t ends<<<$(get_categories $CATCMD $LOG "$e1")
     (( ${#ends[@]} )) && [[ -n ${ends[0]} ]] || return
 
@@ -36,8 +40,10 @@ process_log ()
     for line in "${ends[@]}"; do
         buildtime=$(echo "$line"| sed -rn 's/.+ Took ([0-9]+).[0-9]+ seconds .+/\1/p')
         (($buildtime>30)) || continue
-        logtime=$(echo "$line"| sed -rn 's/[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ .+/\10/p')
-        vm=$(echo "$line"| sed -rn 's/.+ \[instance: ([0-9a-z-]+)\] .+/\1/p')
+        logtime=$(echo "$line"| sed -rn "s/$EXPR_LOG_DATE_GROUP_TIME .+/\1/p")
+        # round to nearest 10 minutes
+        logtime=${logtime[0]::4}0
+        vm=$(echo "$line"| sed -rn "s/.+ $EXPR_LOG_INSTANCE_UUID_GROUP_UUID .+/\1/p")
         BUILD_ENDS_TIMES[$vm]=$logtime
         end=$(grep -nF "$line" $LOG| cut -d ':' -f 1)
         BUILD_ENDS[$vm]=$end
@@ -59,7 +65,8 @@ process_log ()
     init_dataset $DATA_TMP "" $key
 
     for vm in ${!BUILD_BACKLOGS[@]}; do
-        t=${BUILD_ENDS_TIMES[$vm]}
+        # round to nearest 10 minutes
+        t=${BUILD_ENDS_TIMES[$vm]::4}0
         path=${DATA_TMP}/${t//:/_}
         current=$(cat $path/$key)
         backlog=${BUILD_BACKLOGS[$vm]}
@@ -71,10 +78,8 @@ process_log ()
 results_dir=$(get_results_dir)
 data_tmp=`mktemp -d -p $results_dir`
 csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
-module=nova.compute.manager
 y_label=instance-build-backlog-size
 
-process_log $(filter_log $LOG $module) $data_tmp $csv_path
+process_log $(filter_log $LOG $MODULE) $data_tmp $csv_path
 write_meta $results_dir time $y_label
 cleanup $data_tmp $csv_path
-

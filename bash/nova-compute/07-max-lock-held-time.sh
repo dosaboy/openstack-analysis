@@ -4,6 +4,10 @@
 #
 . $SCRIPT_ROOT/lib.sh
 
+MODULE=oslo_concurrency.lockutils
+. $SCRIPT_ROOT/log_expressions.sh
+
+
 is_uuid ()
 {
     if $(echo "$1"| egrep -q "([0-9a-z]){32}"); then
@@ -67,6 +71,8 @@ process_log ()
 
         ((NUM_JOBS+=1))
         for t in $($CATCMD $LOG| sed -rn "$(eval echo \"$CATEGORY_EXPR2\")"); do
+            # round to nearest 10 minutes
+            t=${t[0]::4}0
             local path=${DATA_TMP}/${t//:/_}
             if is_uuid $name; then
                 name=$RESOURCE_TAG
@@ -89,11 +95,10 @@ process_log ()
 results_dir=$(get_results_dir)
 data_tmp=`mktemp -d -p $results_dir`
 csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
-module=oslo_concurrency.lockutils
 y_label=max-lock-held-time
-expr1="s/[0-9-]+ [0-9:]+:[0-9][0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
-expr2="s/[0-9-]+ ([0-9:]+:[0-9])[0-9]:[0-9]+.[0-9]+ [0-9]+ \w+ $module .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\10/p"
+expr1="s/$EXPR_LOG_DATE [0-9]+ \w+ $MODULE .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
+expr2="s/$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $MODULE .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\1/p"
 
-process_log $(filter_log $LOG $module) $data_tmp $csv_path "$expr1" "$expr2"
+process_log $(filter_log $LOG $MODULE) $data_tmp $csv_path "$expr1" "$expr2"
 write_meta $results_dir time $y_label
 cleanup $data_tmp $csv_path

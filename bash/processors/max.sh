@@ -25,6 +25,7 @@ process_log_max ()
     echo "0" > $flag
     for c in ${cols[@]}; do
         ((num_jobs+=1))
+        INSERT=$c
         readarray -t rows<<<$($catcmd $logfile| sed -rn "$(eval echo \"$rows_expr\")")
         (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || continue
         for row in "${rows[@]}"; do
