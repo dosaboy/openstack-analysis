@@ -1,5 +1,25 @@
 process_log_deltas ()
 {
+    # Description: 
+    #   Identify start and end times for an event using a search
+    #   expression for each then calculate the time delta and
+    #   save the maximum occurence per 10 minute window.
+    #
+    #   The resulting csv data will have one y-axis column
+    #   and a row for every ten minutes of time.
+    #
+    # Params:
+    #   logfile: path to logfile
+    #   data_tmp: path to temporary directory used to store data
+    #   csv_path: path to output CSV file
+    #   cols_expr: regular expression (sed) used to identify columns.
+    #              Must identify one result group that matches the column
+    #              name.
+    #   rows_expr: regular expression (sed) used to identify row.
+    #              This expression will typically be the same as cols_expr
+    #              but with an $INSERT variable in place of the column
+    #              name.
+
     (($#==5)) || { echo "ERROR: insufficient args ($#) to process_log_deltas()"; exit 1; }
     local logfile=$1
     local data_tmp=$2

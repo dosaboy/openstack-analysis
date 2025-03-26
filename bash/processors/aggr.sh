@@ -1,5 +1,25 @@
 process_log_aggr ()
 {
+    # Description: 
+    #   Identify one more resources/columns then for each get
+    #   values within a 10 minute window and add/aggregate
+    #   them.
+    #
+    #   The resulting csv data will have one y-axis column per
+    #   resource and a row for every ten minutes of time.
+    #
+    # Params:
+    #   logfile: path to logfile
+    #   data_tmp: path to temporary directory used to store data
+    #   csv_path: path to output CSV file
+    #   cols_expr: regular expression (sed) used to identify columns.
+    #              Must identify one result group that matches the column
+    #              name.
+    #   rows_expr: regular expression (sed) used to identify row.
+    #              This expression will typically be the same as cols_expr
+    #              but with an $INSERT variable in place of the column
+    #              name.
+
     (($#==5)) || { echo "ERROR: insufficient args ($#) to process_log_aggr()"; exit 1; }
     local logfile=$1
     local data_tmp=$2
