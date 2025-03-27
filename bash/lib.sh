@@ -138,7 +138,7 @@ filter_log ()
     local cmd=egrep
 
     file --mime-type $path| grep -q application/gzip && cmd=zegrep
-    filtered=$(mktemp -p $data_tmp)
+    filtered=$(mktemp -p $DATA_TMP)
     if $reverse; then
         $cmd -v "$filter" $path > $filtered
     else
@@ -147,7 +147,30 @@ filter_log ()
     echo $filtered
 }
 
+skip ()
+{
+    echo "INFO: $1"
+    exit 0
+}
+
 # Load processors
 for processor in ${SCRIPT_ROOT}/processors/*; do
     . $processor
 done
+
+SCRIPT_HEADER ()
+{
+    export LOG_MODULE=$1
+    . $SCRIPT_ROOT/log_expressions.sh
+    export RESULTS_DIR=$(get_results_dir)
+    export DATA_TMP=`mktemp -d -p $RESULTS_DIR`
+    export CSV_PATH=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
+}
+
+
+SCRIPT_FOOTER ()
+{
+    export Y_LABEL=$1
+    write_meta $RESULTS_DIR time $Y_LABEL
+    cleanup $DATA_TMP $CSV_PATH
+}

@@ -4,16 +4,10 @@
 #
 . $SCRIPT_ROOT/lib.sh
 
-MODULE=os_vif
-. $SCRIPT_ROOT/log_expressions.sh
+SCRIPT_HEADER os_vif
 
-results_dir=$(get_results_dir)
-data_tmp=`mktemp -d -p $results_dir`
-csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
-y_label=os-vif-plug-time
 expr1="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ Plugging vif .+"
 expr2="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ Successfully plugged vif .+"
+process_log_deltas $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH "$expr1" "$expr2"
 
-process_log_deltas $(filter_log $LOG $MODULE) $data_tmp $csv_path "$expr1" "$expr2"
-write_meta $results_dir time $y_label
-cleanup $data_tmp $csv_path
+SCRIPT_FOOTER os-vif-plug-time

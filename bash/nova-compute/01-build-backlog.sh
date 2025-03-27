@@ -5,15 +5,11 @@
 #
 . $SCRIPT_ROOT/lib.sh
 
-MODULE=nova.compute.manager
-. $SCRIPT_ROOT/log_expressions.sh
-
-
 process_log ()
 {
     local LOG=$1
     local DATA_TMP=$2
-    local csv_path=$3
+    local CSV_PATH=$3
     local CATCMD
     local MAX_JOBS=10
     local NUM_JOBS=0
@@ -23,7 +19,7 @@ process_log ()
     local start=
     local end=
 
-    ensure_csv_path $csv_path
+    ensure_csv_path $CSV_PATH
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
     e1="s/$EXPR_LOG_DATE $EXPR_LOG_CONTEXT $EXPR_LOG_INSTANCE_UUID Took [0-9.]+ seconds to build instance./\0/p"
@@ -72,14 +68,11 @@ process_log ()
         backlog=${BUILD_BACKLOGS[$vm]}
         echo $((current+backlog)) > $path/$key
     done
-    create_csv $csv_path $DATA_TMP
+    create_csv $CSV_PATH $DATA_TMP
 }
 
-results_dir=$(get_results_dir)
-data_tmp=`mktemp -d -p $results_dir`
-csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
-y_label=instance-build-backlog-size
+SCRIPT_HEADER nova.compute.manager
 
-process_log $(filter_log $LOG $MODULE) $data_tmp $csv_path
-write_meta $results_dir time $y_label
-cleanup $data_tmp $csv_path
+process_log $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH
+
+SCRIPT_FOOTER instance-build-backlog-size

@@ -4,9 +4,6 @@
 #
 . $SCRIPT_ROOT/lib.sh
 
-MODULE=oslo_concurrency.lockutils
-. $SCRIPT_ROOT/log_expressions.sh
-
 
 is_uuid ()
 {
@@ -24,14 +21,14 @@ process_log ()
 {
     local LOG=$1
     local DATA_TMP=$2
-    local csv_path=$3
+    local CSV_PATH=$3
     local CATEGORY_EXPR1="$4"
     local CATEGORY_EXPR2="$5"
     local CATCMD
     local MAX_JOBS=10
     local NUM_JOBS=0
 
-    ensure_csv_path $csv_path
+    ensure_csv_path $CSV_PATH
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
     readarray -t CATEGORY<<<$($CATCMD $LOG| sed -rn "$CATEGORY_EXPR1"| sort -u)
@@ -88,17 +85,14 @@ process_log ()
         fi
     done
     wait
-    (($(cat $flag)==1)) && create_csv $csv_path $DATA_TMP
+    (($(cat $flag)==1)) && create_csv $CSV_PATH $DATA_TMP
     rm $flag
 }
 
-results_dir=$(get_results_dir)
-data_tmp=`mktemp -d -p $results_dir`
-csv_path=$results_dir/${HOSTNAME}_$(basename $results_dir).csv
-y_label=max-lock-held-time
-expr1="s/$EXPR_LOG_DATE [0-9]+ \w+ $MODULE .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
-expr2="s/$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $MODULE .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\1/p"
+SCRIPT_HEADER oslo_concurrency.lockutils
 
-process_log $(filter_log $LOG $MODULE) $data_tmp $csv_path "$expr1" "$expr2"
-write_meta $results_dir time $y_label
-cleanup $data_tmp $csv_path
+expr1="s/$EXPR_LOG_DATE [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
+expr2="s/$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\1/p"
+process_log $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH "$expr1" "$expr2"
+
+SCRIPT_FOOTER max-lock-held-time

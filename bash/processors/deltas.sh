@@ -10,8 +10,8 @@ process_log_deltas ()
     #
     # Params:
     #   logfile: path to logfile
-    #   data_tmp: path to temporary directory used to store data
-    #   csv_path: path to output CSV file
+    #   DATA_TMP: path to temporary directory used to store data
+    #   CSV_PATH: path to output CSV file
     #   cols_expr: regular expression (sed) used to identify columns.
     #              Must identify one result group that matches the column
     #              name.
@@ -22,8 +22,8 @@ process_log_deltas ()
 
     (($#==5)) || { echo "ERROR: insufficient args ($#) to process_log_deltas()"; exit 1; }
     local logfile=$1
-    local data_tmp=$2
-    local csv_path=$3
+    local DATA_TMP=$2
+    local CSV_PATH=$3
     local cols_expr="$4"
     local rows_expr="$5"
     local catcmd=cat
@@ -38,7 +38,7 @@ process_log_deltas ()
 
     #echo "Searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
 
-    ensure_csv_path $csv_path
+    ensure_csv_path $CSV_PATH
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
     readarray -t starts<<<$(get_categories $catcmd $logfile "s/$cols_expr/\0/p")
@@ -67,7 +67,7 @@ process_log_deltas ()
 
     label=$(get_script_name)_deltas
     for tsdate in ${!tsdates[@]}; do
-        init_dataset $data_tmp "$tsdate" $label
+        init_dataset $DATA_TMP "$tsdate" $label
     done
     for resource in ${!range_starts[@]}; do
         [[ -n ${range_ends[$resource]:-""} ]] || continue
@@ -76,10 +76,10 @@ process_log_deltas ()
                     ${range_ends[$resource]}) )
         ((${#info[@]})) || continue
         t=${info[0]}
-        path=${data_tmp}/${t//:/_}
+        path=${DATA_TMP}/${t//:/_}
         current=$(cat $path/$label)
         ((current<${info[1]})) || continue
         echo ${info[1]} > $path/$label
     done
-    create_csv $csv_path $data_tmp
+    create_csv $CSV_PATH $DATA_TMP
 }
