@@ -1,1 +1,1 @@
-bash/plot.sh
+bin/plot.sh

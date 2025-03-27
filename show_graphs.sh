@@ -1,1 +1,1 @@
-bash/show_graphs.sh
+bin/show_graphs.sh
