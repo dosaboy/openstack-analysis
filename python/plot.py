@@ -65,18 +65,9 @@ class PLOT():
     def force(self):
         return os.environ.get('OVERWRITE_CSV') == "true"
 
-    def stacked(self):
-        print(f"Plotting data for {self.name} ({self.path})")
-        if os.path.exists(self.output) and not self.force:
-            print(f"INFO: {self.output} already exists - use --overwrite to "
-                  "recreate")
-            return
-
+    @property
+    def x_data(self):
         data = self.csv
-        _, ax = plt.subplots()
-        stacked = []
-        labels = []
-        x = []
         try:
             a = np.datetime64(f"{data['datetime'].values[0]}:00")
             b = np.datetime64(f"{data['datetime'].values[-1]}:00")
@@ -85,20 +76,36 @@ class PLOT():
             b = np.datetime64(f"2025-01-01T{data['datetime'].values[-1]}:00")
 
         b += np.timedelta64(10, 'm')
-        x = np.arange(a, b, np.timedelta64(10, 'm'))
+        return np.arange(a, b, np.timedelta64(10, 'm'))
 
-        # bottom = np.zeros(len(data['datetime']))
-        for key in data:
+    def stacked(self, use_bar=False):
+        print(f"Plotting data for {self.name} ({self.path})")
+        if os.path.exists(self.output) and not self.force:
+            print(f"INFO: {self.output} already exists - use --overwrite to "
+                  "recreate")
+            return
+
+        stacked = []
+        labels = []
+        _, ax = plt.subplots()
+        for key in self.csv:
             if key == 'datetime':
                 continue
 
             labels.append(key)
-            stacked.append(data[key])
-            # width = 0.5
-            # ax.bar(x, data[key], width, label=key, bottom=bottom)
-            # bottom += data[key]
+            stacked.append(self.csv[key])
 
-        ax.stackplot(x, stacked, labels=labels)
+        if use_bar:
+            width = 0.005
+            bottom = np.zeros(len(self.csv['datetime']))
+            for label, item in zip(labels, stacked):
+                ax.bar(self.x_data, item, width, label=label,
+                       bottom=bottom)
+                bottom += self.csv[label]
+        else:
+            ax.stackplot(self.x_data, stacked, labels=labels)
+
+        ax.xaxis_date()
         plt.xlabel(self.meta['xlabel'])
         plt.ylabel(self.meta['ylabel'])
         plt.legend()
