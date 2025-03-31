@@ -10,7 +10,12 @@ for sos in $(ls -d $SOS_ROOT); do
         echo $sos| grep -q $HOST_OVERRIDE || continue
     fi
     export ROOT=$sos
-    export HOSTNAME=$(cat $ROOT/hostname)
+    if [[ -r $ROOT/hostname ]]; then
+        export HOSTNAME=$(cat $ROOT/hostname)
+    else
+        export HOSTNAME="unknownhost-$(uuidgen)"
+        echo "WARNING: could not determine hostname in $ROOT - using $HOSTNAME"
+    fi
 
     export LOG=$ROOT/var/log/nova/nova-compute.log${LOGROTATE}
     [[ -e $LOG ]] && $SCRIPT_ROOT/nova-compute/__all__.sh
