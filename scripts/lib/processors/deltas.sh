@@ -7,7 +7,9 @@ get_timings ()
 
     local sed_expr="$1"
     local path=$2
-    # NOTE: uses global TIMINGS_DARRAY_STORE to store results
+
+    # NOTE: uses globals to store results:
+    #   - TIMINGS_DARRAY_STORE
 
     declare -A dups=()
     while read line; do
@@ -31,6 +33,24 @@ get_timings ()
     done
 }
 
+deltas_init_dataset ()
+{
+    local y_label=$1
+    local path=$2
+    shift 2
+    declare -a dates=( $@ )
+
+    # get Y-M-D variants
+    declare -A tsdates=()
+    for _date in ${dates[@]}; do
+        tsdates[$(echo $_date|egrep -o "^([0-9-]+)")]=true
+    done
+
+    for tsdate in ${!tsdates[@]}; do
+        init_dataset $path "$tsdate" $y_label
+    done
+}
+
 process_log_deltas ()
 {
     # Description:
@@ -43,8 +63,8 @@ process_log_deltas ()
     #
     # Params:
     #   logfile: path to logfile
-    #   DATA_TMP: path to temporary directory used to store data
-    #   CSV_PATH: path to output CSV file
+    #   data_tmp: path to temporary directory used to store data
+    #   csv_path: path to output CSV file
     #   cols_expr: regular expression (sed) used to identify columns.
     #              Must identify one result group that matches the column
     #              name.
@@ -55,30 +75,29 @@ process_log_deltas ()
 
     (($#==5)) || { echo "ERROR: insufficient args ($#) to process_log_deltas()"; exit 1; }
     local logfile=$1
-    local DATA_TMP=$2
-    local CSV_PATH=$3
+    local data_tmp=$2
+    local csv_path=$3
     local cols_expr="$4"
     local rows_expr="$5"
     local catcmd=cat
     local max_jobs=10
     local num_jobs=0
-    local label=
+    local y_label=$(get_script_name)_deltas
     local current=
     local path=
-    declare -A tsdates=()
     declare -A range_starts=()
     declare -A range_ends=()
 
     #echo "Searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
 
-    ensure_csv_path $CSV_PATH
+    ensure_csv_path $csv_path
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
-    starts=$(mktemp -p $DATA_TMP)
+    starts=$(mktemp -p $data_tmp)
     get_categories $catcmd $logfile "s/$cols_expr/\0/p" > $starts
     [[ -s $starts ]] || return
 
-    ends=$(mktemp -p $DATA_TMP)
+    ends=$(mktemp -p $data_tmp)
     get_categories $catcmd $logfile "s/$rows_expr/\0/p" > $ends
     [[ -s $ends ]] || return
 
@@ -90,17 +109,8 @@ process_log_deltas ()
     get_timings "$rows_expr" $ends
     (( ${#range_ends[@]} )) || return
 
-    # get Y-M-D variants
-    declare -A tsdates=()
-    for _date in ${range_starts[@]}; do
-        _date=$(echo $_date|egrep -o "^([0-9-]+)")
-        tsdates[$_date]=true
-    done
+    deltas_init_dataset $y_label $data_tmp ${range_starts[@]}
 
-    label=$(get_script_name)_deltas
-    for tsdate in ${!tsdates[@]}; do
-        init_dataset $DATA_TMP "$tsdate" $label
-    done
     for resource in ${!range_starts[@]}; do
         [[ -n ${range_ends[$resource]:-""} ]] || continue
         info=( $(python3 $SCRIPT_ROOT/../python/datecheck.py \
@@ -108,10 +118,10 @@ process_log_deltas ()
                     ${range_ends[$resource]}) )
         ((${#info[@]})) || continue
         t=${info[0]}
-        path=${DATA_TMP}/${t//:/_}
-        current=$(cat $path/$label)
+        path=${data_tmp}/${t//:/_}
+        current=$(cat $path/$y_label)
         ((current<${info[1]})) || continue
-        echo ${info[1]} > $path/$label
+        echo ${info[1]} > $path/$y_label
     done
-    create_csv $CSV_PATH $DATA_TMP
+    create_csv $csv_path $data_tmp
 }

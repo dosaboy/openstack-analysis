@@ -19,6 +19,8 @@ is_uuid ()
 
 process_log ()
 {
+    # OVERRIDE DEFAULT PROCESSOR
+
     local LOG=$1
     local DATA_TMP=$2
     local CSV_PATH=$3
