@@ -82,11 +82,11 @@ process_log_deltas ()
     local catcmd=cat
     local max_jobs=10
     local num_jobs=0
-    local y_label=$(get_script_name)_deltas
     local current=
     local path=
     declare -A range_starts=()
     declare -A range_ends=()
+    y_label=$(get_script_name)_deltas
 
     #echo "Searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
 

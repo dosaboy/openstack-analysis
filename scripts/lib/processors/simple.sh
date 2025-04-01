@@ -13,13 +13,13 @@ process_log_simple ()
     #   logfile: path to logfile
     #   DATA_TMP: path to temporary directory used to store data
     #   CSV_PATH: path to output CSV file
-    #   rows_expr: regular expression (sed) used to identify row.
-    #              This expression will typically be the same as cols_expr
-    #              but with an $INSERT variable in place of the column
-    #              name.
+    #   rows_expr: regular expression (sed) used to identify rows that contains
+    #              at least two results groups; the first is datetime and the
+    #              rest map told cols.
     #   cols:      a list of one or more column names. The number of result
     #              groups in rows_expr must be exactly one greater than
-    #              this number of columns.
+    #              this number of columns (since the first grouping is always 
+    #              the date).
 
     (($#>4)) || { echo "ERROR: insufficient args to process_log_simple()"; exit 1; }
     local logfile=$1
