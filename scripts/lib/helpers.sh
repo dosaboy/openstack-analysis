@@ -151,8 +151,7 @@ filter_log ()
 skip ()
 {
     local reason=${1:-"unknown"}
-    echo "INFO: skipping script - reason='$msg'"
-    cleanup $DATA_TMP $CSV_PATH
+    echo "INFO: skipping script - reason='$reason'"
     exit 0
 }
 

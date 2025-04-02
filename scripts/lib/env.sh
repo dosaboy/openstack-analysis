@@ -6,6 +6,7 @@ export HOST_OVERRIDE=
 export SOS_ROOT=
 export PLOT_GRAPHS=false
 export OUTPUT_PATH=results
+export AGENT_SCRIPTS=
 export LOGROTATE=
 
 usage ()
@@ -22,6 +23,8 @@ SYNOPSIS
         Overwrite existing CSV files. Defaults to false.
     --host
         Filter a specific host.
+    --agent
+        Run scripts for a specific agent.
     --path
         Path to one or more unpacked sosreport.
     --plot
@@ -41,6 +44,10 @@ while (($# > 0)); do
         -h|--help)
             usage
             exit 0
+            ;;
+        --agent)
+            AGENT_SCRIPTS=$2
+            shift
             ;;
         --host)
             HOST_OVERRIDE=$2

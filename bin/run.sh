@@ -29,6 +29,10 @@ for sos in $(ls -d $SOS_ROOT); do
     fi
 
     for mod in ${!ENTRYPOINTS[@]}; do
+        if [[ -n $AGENT_SCRIPTS ]] && [[ $AGENT_SCRIPTS != $mod ]]; then
+            echo "INFO: skipping $mod scripts"
+            continue
+        fi
         export LOG=$ROOT${ENTRYPOINTS[$mod]}
         [[ -e $LOG ]] && $SCRIPT_ROOT/${mod%.*}/__all__.sh
     done

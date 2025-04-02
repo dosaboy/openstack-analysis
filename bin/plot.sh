@@ -13,11 +13,11 @@ fi
 
 echo "Plotting graphs..."
 if [[ -n $HOST_OVERRIDE ]]; then
-    rm -f $GRAPHS_PATH/$HOST_OVERRIDE/*
+    $OVERWRITE_CSV && rm -f $GRAPHS_PATH/$HOST_OVERRIDE/*
     find $DATA_PATH -name \*.csv| grep $HOST_OVERRIDE| \
         xargs -l python3 $PYTHON_SCRIPTS/plot.py
 else
-    rm -rf $GRAPHS_PATH/*
+    $OVERWRITE_CSV && rm -rf $GRAPHS_PATH/*
     find $DATA_PATH -name \*.csv| \
         xargs -l python3 $PYTHON_SCRIPTS/plot.py
 fi
