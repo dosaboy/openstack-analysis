@@ -4,7 +4,7 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
-skip "skipping $(basename $0) as it can take a very long time to run - enable manually if needed"
+skip "$(basename $0) can take a very long time to run - enable manually if needed"
 
 SCRIPT_HEADER neutron.wsgi
 

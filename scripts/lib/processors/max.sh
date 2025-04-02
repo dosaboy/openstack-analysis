@@ -38,7 +38,7 @@ process_log_max ()
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
     declare -a cols=( $(get_categories $catcmd $logfile "$cols_expr") )
-    (( ${#cols[@]} )) && [[ -n ${cols[0]} ]] || return
+    (( ${#cols[@]} )) && [[ -n ${cols[0]} ]] || return 0
 
     init_dataset $DATA_TMP "" ${cols[@]}
     flag=$(mktemp)

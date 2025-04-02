@@ -17,7 +17,7 @@ _init_time ()
         prefix=${date}T
     fi
 
-    ((min % 10)) && return
+    ((min % 10)) && return  0
     ((min == 0)) && min=${min}0
     path=${root}/${prefix}${hour}_${min}
     if ! [[ -d $path ]]; then
@@ -47,7 +47,7 @@ cleanup ()
     local tmpdir=$1
     local csv_file=$2
 
-    [[ -n $tmpdir ]] || { echo "ERROR!"; exit 1; }
+    [[ -n $tmpdir ]] || { echo "ERROR: datatmp path ($tmpdir) not set!"; exit 1; }
 
     rm -rf $tmpdir
     [[ -f $csv_file ]] && ls -al $csv_file
@@ -94,6 +94,7 @@ ensure_csv_path ()
     if [[ -e $path ]]; then
         if ! $OVERWRITE_CSV; then
             echo "$path already exists and overwrite=false - skipping"
+            cleanup $DATA_TMP $CSV_PATH
             exit 0
         fi
 
@@ -138,7 +139,7 @@ filter_log ()
     local cmd=egrep
 
     file --mime-type $path| grep -q application/gzip && cmd=zegrep
-    filtered=$(mktemp -p $DATA_TMP)
+    filtered=$(mktemp -p $DATA_TMP --suffix=-filteredlog)
     if $reverse; then
         $cmd -v "$filter" $path > $filtered
     else
@@ -149,7 +150,9 @@ filter_log ()
 
 skip ()
 {
-    echo "INFO: $1"
+    local reason=${1:-"unknown"}
+    echo "INFO: skipping script - reason='$msg'"
+    cleanup $DATA_TMP $CSV_PATH
     exit 0
 }
 
@@ -163,7 +166,7 @@ SCRIPT_HEADER ()
     export LOG_MODULE=$1
     . $SCRIPT_ROOT/lib/log_expressions.sh
     export RESULTS_DIR=$(get_results_dir)
-    export DATA_TMP=`mktemp -d -p $RESULTS_DIR`
+    export DATA_TMP=`mktemp -d -p $RESULTS_DIR --suffix=-datatmp`
     export CSV_PATH=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
 }
 

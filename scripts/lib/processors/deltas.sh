@@ -95,19 +95,19 @@ process_log_deltas ()
 
     starts=$(mktemp -p $data_tmp)
     get_categories $catcmd $logfile "s/$cols_expr/\0/p" > $starts
-    [[ -s $starts ]] || return
+    [[ -s $starts ]] || return 0
 
     ends=$(mktemp -p $data_tmp)
     get_categories $catcmd $logfile "s/$rows_expr/\0/p" > $ends
-    [[ -s $ends ]] || return
+    [[ -s $ends ]] || return 0
 
     declare -n TIMINGS_DARRAY_STORE="range_starts"
     get_timings "$cols_expr" $starts
-    (( ${#range_starts[@]} )) || return
+    (( ${#range_starts[@]} )) || return 0
 
     declare -n TIMINGS_DARRAY_STORE="range_ends"
     get_timings "$rows_expr" $ends
-    (( ${#range_ends[@]} )) || return
+    (( ${#range_ends[@]} )) || return 0
 
     deltas_init_dataset $y_label $data_tmp ${range_starts[@]}
 

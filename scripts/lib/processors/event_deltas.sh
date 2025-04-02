@@ -108,24 +108,24 @@ process_log_event_deltas ()
     # get sequence end
     ends=$(mktemp -p $data_tmp)
     get_categories $catcmd $logfile "s/$rows_expr/\0/p" > $ends
-    [[ -s $ends ]] || return
+    [[ -s $ends ]] || return 0
 
     # get sequence starts
     starts=$(mktemp -p $data_tmp)
     get_categories $catcmd $logfile "s/$cols_expr/\0/p" > $starts
-    [[ -s $starts ]] || return
+    [[ -s $starts ]] || return 0
 
     # line numbers of sequence ends
     declare -n LN_DARRAY_STORE="range_ends"
     declare -n TIMINGS_DARRAY_STORE="range_end_times"
     get_line_numbers "$rows_expr" $ends $LOG
-    (( ${#range_ends[@]} )) || return
+    (( ${#range_ends[@]} )) || return 0
 
     # line numbers of sequence starts
     declare -n LN_DARRAY_STORE="range_starts"
     declare -n TIMINGS_DARRAY_STORE="range_start_times"
     get_line_numbers "$cols_expr" $starts $LOG
-    (( ${#range_starts[@]} )) || return
+    (( ${#range_starts[@]} )) || return 0
 
     for resource in ${!range_starts[@]}; do
         start=${range_starts[$resource]}

@@ -37,7 +37,7 @@ process_log_simple ()
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
     readarray -t rows<<<$(get_categories $catcmd $logfile "$rows_expr")
-    (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || return
+    (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || return 0
 
     init_dataset $DATA_TMP "" ${cols[@]}
     for entry in "${rows[@]}"; do

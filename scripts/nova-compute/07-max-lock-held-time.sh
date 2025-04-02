@@ -34,7 +34,7 @@ process_log ()
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
     readarray -t CATEGORY<<<$($CATCMD $LOG| sed -rn "$CATEGORY_EXPR1"| sort -u)
-    (( ${#CATEGORY[@]} )) && [[ -n ${CATEGORY[0]} ]] || return
+    (( ${#CATEGORY[@]} )) && [[ -n ${CATEGORY[0]} ]] || return 0
 
     TIME_LIMIT_MIN=30
 
