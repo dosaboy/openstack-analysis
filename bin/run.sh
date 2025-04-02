@@ -6,14 +6,14 @@ export SCRIPT_ROOT=$BIN_ROOT/../scripts
 [[ -n $SOS_ROOT ]] || { echo "ERROR: sos root required (--path)"; exit 1; }
 
 declare -A ENTRYPOINTS=(
-    [octavia]=/var/log/octavia/octavia-worker.log${LOGROTATE}
-    [ovn.0]=/var/log/openvswitch/ovsdb-server.log${LOGROTATE}
-    [ovn.1]=/var/log/ovn/ovsdb-server-nb.log${LOGROTATE}
-    [ovn.2]=/var/log/ovn/ovsdb-server-sb.log${LOGROTATE}
-    [neutron-api]=/var/log/neutron/neutron-server.log${LOGROTATE}
-    [nova-compute]=/var/log/nova/nova-compute.log${LOGROTATE}
-    [nova-api]=/var/log/nova/nova-conductor.log${LOGROTATE}
-    [rabbitmq-server]=/var/log/rabbitmq/rabbitmq-server.log${LOGROTATE}
+    [octavia]=/var/log/octavia/octavia-worker.log${LOGROTATE:-.1.gz}
+    [ovn.0]=/var/log/openvswitch/ovsdb-server.log${LOGROTATE:-.1.gz}
+    [ovn.1]=/var/log/ovn/ovsdb-server-nb.log${LOGROTATE:-.1.gz}
+    [ovn.2]=/var/log/ovn/ovsdb-server-sb.log${LOGROTATE:-.1.gz}
+    [neutron-api]=/var/log/neutron/neutron-server.log${LOGROTATE:-.1.gz}
+    [nova-compute]=/var/log/nova/nova-compute.log${LOGROTATE:-.1.gz}
+    [nova-api]=/var/log/nova/nova-conductor.log${LOGROTATE:-.1.gz}
+    [rabbitmq-server]=/var/log/rabbitmq/rabbit@*.log${LOGROTATE:-.1}
 )
 
 for sos in $(ls -d $SOS_ROOT); do
@@ -34,6 +34,8 @@ for sos in $(ls -d $SOS_ROOT); do
             continue
         fi
         export LOG=$ROOT${ENTRYPOINTS[$mod]}
+        # If matches more then one file take the first
+        LOG=$(ls $LOG 2>/dev/null| head -n1)
         [[ -e $LOG ]] && $SCRIPT_ROOT/${mod%.*}/__all__.sh
     done
 done
