@@ -35,25 +35,6 @@ get_num_matching_lines ()
     tail -n +$ln_start $logfile| head -n $(($ln_end - $ln_start))| egrep "$expr" | wc -l
 }
 
-deltas_init_dataset ()
-{
-    local label=$1
-    local path=$2
-    shift 2
-    declare -a dates=( $@ )
-
-    # get Y-M-D variants
-    declare -A tsdates=()
-    for _date in ${dates[@]}; do
-        tsdates[$(echo $_date|egrep -o "^([0-9-]+)")]=true
-    done
-
-    for tsdate in ${!tsdates[@]}; do
-        init_dataset $path "$tsdate" $label
-    done
-}
-
-
 process_log_event_deltas ()
 {
     # Description:
@@ -134,7 +115,7 @@ process_log_event_deltas ()
         event_deltas[$resource]=$(get_num_matching_lines $start $end "$delta_events_expr" $LOG)
     done
 
-    deltas_init_dataset $y_label $data_tmp ${range_start_times[@]}
+    init_dataset_multi_date $y_label $data_tmp ${range_start_times[@]}
 
     for vm in ${!event_deltas[@]}; do
         # round to nearest 10 minutes

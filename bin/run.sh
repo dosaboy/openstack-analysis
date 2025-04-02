@@ -6,13 +6,13 @@ export SCRIPT_ROOT=$BIN_ROOT/../scripts
 [[ -n $SOS_ROOT ]] || { echo "ERROR: sos root required (--path)"; exit 1; }
 
 declare -A ENTRYPOINTS=(
-    [octavia]=/var/log/octavia/octavia-worker.log${LOGROTATE:-.1.gz}
+    [octavia]=/var/log/octavia/octavia-worker.log${LOGROTATE:-.1}
     [ovn.0]=/var/log/openvswitch/ovsdb-server.log${LOGROTATE:-.1.gz}
     [ovn.1]=/var/log/ovn/ovsdb-server-nb.log${LOGROTATE:-.1.gz}
     [ovn.2]=/var/log/ovn/ovsdb-server-sb.log${LOGROTATE:-.1.gz}
-    [neutron-api]=/var/log/neutron/neutron-server.log${LOGROTATE:-.1.gz}
-    [nova-compute]=/var/log/nova/nova-compute.log${LOGROTATE:-.1.gz}
-    [nova-api]=/var/log/nova/nova-conductor.log${LOGROTATE:-.1.gz}
+    [neutron-api]=/var/log/neutron/neutron-server.log${LOGROTATE:-.1}
+    [nova-compute]=/var/log/nova/nova-compute.log${LOGROTATE:-.1}
+    [nova-api]=/var/log/nova/nova-conductor.log${LOGROTATE:-.1}
     [rabbitmq-server]=/var/log/rabbitmq/rabbit@*.log${LOGROTATE:-.1}
 )
 

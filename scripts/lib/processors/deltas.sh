@@ -33,24 +33,6 @@ get_timings ()
     done
 }
 
-deltas_init_dataset ()
-{
-    local y_label=$1
-    local path=$2
-    shift 2
-    declare -a dates=( $@ )
-
-    # get Y-M-D variants
-    declare -A tsdates=()
-    for _date in ${dates[@]}; do
-        tsdates[$(echo $_date|egrep -o "^([0-9-]+)")]=true
-    done
-
-    for tsdate in ${!tsdates[@]}; do
-        init_dataset $path "$tsdate" $y_label
-    done
-}
-
 process_log_deltas ()
 {
     # Description:
@@ -109,7 +91,7 @@ process_log_deltas ()
     get_timings "$rows_expr" $ends
     (( ${#range_ends[@]} )) || return 0
 
-    deltas_init_dataset $y_label $data_tmp ${range_starts[@]}
+    init_dataset_multi_date $y_label $data_tmp ${range_starts[@]}
 
     for resource in ${!range_starts[@]}; do
         [[ -n ${range_ends[$resource]:-""} ]] || continue

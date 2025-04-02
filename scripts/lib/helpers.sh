@@ -9,6 +9,7 @@ _init_time ()
     shift 4
     local columns=( $@ )
     local prefix=""
+    local path
 
     ((hour<10)) && hour="0$hour"
 
@@ -39,6 +40,24 @@ init_dataset ()
         for m in {0..59}; do
             _init_time $root "$date" $h $m ${columns[@]}
         done
+    done
+}
+
+init_dataset_multi_date ()
+{
+    local label=$1
+    local path=$2
+    shift 2
+    declare -a dates=( $@ )
+
+    # get Y-M-D variants
+    declare -A tsdates=()
+    for _date in ${dates[@]}; do
+        tsdates[$(echo $_date|egrep -o "^([0-9-]+)")]=true
+    done
+
+    for tsdate in ${!tsdates[@]}; do
+        init_dataset $path "$tsdate" $label
     done
 }
 
