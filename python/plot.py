@@ -1,9 +1,8 @@
 #!/usr/bin/python3
+import argparse
+import glob
 import os
-import sys
-import datetime
 from collections import UserDict
-from functools import cached_property
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,43 +30,35 @@ class PLOT():
     PLOT_SIZE_Y = 12
     PLOT_PAD_INCHES = 0.25
 
-    @cached_property
-    def meta(self):
-        path = os.path.join(os.path.dirname(sys.argv[1]), 'meta.yaml')
+    def __init__(self, args):
+        self.args = args
+
+    @staticmethod
+    def get_meta(csv_path):
+        path = os.path.join(os.path.dirname(csv_path), 'meta.yaml')
         return yaml.safe_load(open(path, encoding='utf-8'))
 
-    @property
-    def output(self):
-        return os.path.join(self.output_dir, f"{self.name}.png")
-
-    @property
-    def path(self):
-        return sys.argv[1]
-
-    @property
-    def name(self):
-        return os.path.basename(self.path).partition('.')[0]
-
-    @property
-    def output_dir(self):
-        dpath = os.environ['OUTPUT_PATH']
-        dpath = os.path.join(dpath, 'graphs', self.name.partition('_')[0])
+    def get_output_dir(self, name):
+        dpath = os.path.join(self.args.output_path, 'graphs',
+                             name.partition('_')[0])
         if not os.path.exists(dpath):
             os.makedirs(dpath)
 
         return dpath
 
-    @cached_property
-    def csv(self):
-        return pd.read_csv(self.path)
-
     @property
-    def force(self):
-        return os.environ.get('OVERWRITE_CSV') == "true"
+    def data_files(self):
+        return glob.glob(os.path.join(self.args.data_path, '*/*/*.csv'))
 
-    @property
-    def x_data(self):
-        data = self.csv
+    def run(self):
+        for path in self.data_files:
+            name = os.path.basename(path).partition('.')[0]
+            print(f"Plotting data for {name} ({path})")
+            self.stacked(name, pd.read_csv(path), self.get_meta(path))
+
+    @staticmethod
+    def x_data(csv):
+        data = csv
         try:
             a = np.datetime64(f"{data['datetime'].values[0]}:00")
             b = np.datetime64(f"{data['datetime'].values[-1]}:00")
@@ -78,101 +69,50 @@ class PLOT():
         b += np.timedelta64(10, 'm')
         return np.arange(a, b, np.timedelta64(10, 'm'))
 
-    def stacked(self, use_bar=False):
-        print(f"Plotting data for {self.name} ({self.path})")
-        if os.path.exists(self.output) and not self.force:
-            print(f"INFO: {self.output} already exists - use --overwrite to "
+    def stacked(self, name, csv, meta, use_bar=False):
+        output = os.path.join(self.get_output_dir(name), f"{name}.png")
+        if os.path.exists(output) and not self.args.overwrite:
+            print(f"INFO: {output} already exists - use --overwrite to "
                   "recreate")
             return
 
         stacked = []
         labels = []
         _, ax = plt.subplots()
-        for key in self.csv:
+        for key in csv:
             if key == 'datetime':
                 continue
 
             labels.append(key)
-            stacked.append(self.csv[key])
+            stacked.append(csv[key])
 
         if use_bar:
             width = 0.005
-            bottom = np.zeros(len(self.csv['datetime']))
+            bottom = np.zeros(len(csv['datetime']))
             for label, item in zip(labels, stacked):
-                ax.bar(self.x_data, item, width, label=label,
+                ax.bar(self.x_data(csv), item, width, label=label,
                        bottom=bottom)
-                bottom += self.csv[label]
+                bottom += csv[label]
         else:
-            ax.stackplot(self.x_data, stacked, labels=labels)
+            ax.stackplot(self.x_data(csv), stacked, labels=labels)
 
         ax.xaxis_date()
-        plt.xlabel(self.meta['xlabel'])
-        plt.ylabel(self.meta['ylabel'])
+        plt.xlabel(meta['xlabel'])
+        plt.ylabel(meta['ylabel'])
         plt.legend()
         plt.subplots_adjust(**PlotSettings())
         plt.tight_layout()
         plt.gcf().set_size_inches(self.PLOT_SIZE_X, self.PLOT_SIZE_Y)
-        plt.savefig(self.output, dpi=100,
+        plt.savefig(output, dpi=100,
                     bbox_inches='tight',
                     pad_inches=self.PLOT_PAD_INCHES)
-
-    @staticmethod
-    def test():
-        # data from https://allisonhorst.github.io/palmerpenguins/
-
-        species = (
-            "Adelie\n $\\mu=$3700.66g",
-            "Chinstrap\n $\\mu=$3733.09g",
-            "Gentoo\n $\\mu=5076.02g$",
-        )
-        weight_counts = {
-            "Below": np.array([70, 31, 58]),
-            "Above": np.array([82, 37, 66]),
-        }
-        width = 0.5
-
-        _, ax = plt.subplots()
-        bottom = np.zeros(3)
-
-        for boolean, weight_count in weight_counts.items():
-            ax.bar(species, weight_count, width, label=boolean, bottom=bottom)
-            bottom += weight_count
-
-        ax.set_title("Number of penguins with above average body mass")
-        ax.legend(loc="upper right")
-
-        plt.show()
-
-    def test2(self):
-        # https://paste.ubuntu.com/p/pmWQXCDk7w/plain/
-        df = self.csv
-
-        x = []
-        for d in df['datetime']:
-            try:
-                x.append(datetime.datetime.strptime(d, "%H:%M"))
-            except ValueError:
-                x.append(datetime.datetime.strptime(d, '%Y-%m-%d:%H:%M'))
-
-        print(type(df['datetime']))
-        df['datetime'] = pd.core.series.Series(x)
-
-        # Plot the stacked bar chart
-        plt.figure(figsize=(12, 6))
-        df.set_index('datetime').plot(kind='bar', stacked=True,
-                                      figsize=(12, 6))
-        plt.xlabel('Time')
-        plt.ylabel('Value')
-        plt.title('Stacked Bar Chart of CSV Data')
-        plt.legend(title='Category', bbox_to_anchor=(1.05, 1),
-                   loc='upper left')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-
-        # Show the plot
-        plt.show()
+        plt.close()
 
 
 if __name__ == "__main__":
-    PLOT().stacked()
-    # PLOT().test2()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--overwrite', action='store_true', default=False)
+    parser.add_argument('--output-path', type=str, required=True)
+    parser.add_argument('--data-path', type=str, required=True)
+    parser.add_argument('--host', type=str, required=False)
+    PLOT(parser.parse_args()).run()
