@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for ovn-northd logs
+[[ $LOG =~ ovn-northd.log ]] || exit 0
+
 SCRIPT_HEADER '\|poll_loop\|'
 
 expr1='s/^[0-9-]+T[0-9:]+\.[0-9]+Z.+\|poll_loop\|INFO\|.+ \([0-9.]+:[0-9]+<->[0-9.]+:([0-9]+)\) .+ \([0-9]+% CPU usage\)/\1/p'
