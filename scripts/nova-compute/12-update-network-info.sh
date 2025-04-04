@@ -11,6 +11,6 @@ expr2="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ $EXPR_LOG
 filtered=$(filter_log $LOG "$LOG_MODULE")
 # filter out updates done by the compute servive itself
 filtered=$(filter_log $filtered "(\- - - - -\])|\[-\]" true)
-process_log_deltas $filtered $DATA_TMP $CSV_PATH "$expr1" "$expr2"
+process_log_deltas $filtered $DATA_TMP $CSV_PATH "$expr1" "$expr2" false
 
 SCRIPT_FOOTER net-info-cache-update-time

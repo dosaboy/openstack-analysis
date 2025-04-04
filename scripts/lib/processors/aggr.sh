@@ -10,8 +10,8 @@ process_log_aggr ()
     #
     # Params:
     #   logfile: path to logfile
-    #   DATA_TMP: path to temporary directory used to store data
-    #   CSV_PATH: path to output CSV file
+    #   data_tmp: path to temporary directory used to store data
+    #   csv_path: path to output CSV file
     #   cols_expr: regular expression (sed) used to identify columns.
     #              Must identify one result group that matches the column
     #              name.
@@ -19,13 +19,16 @@ process_log_aggr ()
     #              This expression will typically be the same as cols_expr
     #              but with an $INSERT variable in place of the column
     #              name.
+    #   filter_log_module: Apply the default filter of LOG_MODULE to the
+    #                      logfile prior to searching.
 
-    (($#==5)) || { echo "ERROR: insufficient args ($#) to process_log_aggr()"; exit 1; }
+    (($#==6)) || { echo "ERROR: insufficient args ($#) to process_log_aggr()"; exit 1; }
     local logfile=$1
-    local DATA_TMP=$2
-    local CSV_PATH=$3
+    local data_tmp=$2
+    local csv_path=$3
     local cols_expr="$4"
     local rows_expr="$5"
+    local filter_log_module=$6
     local catcmd=cat
     local max_jobs=10
     local num_jobs=0
@@ -34,13 +37,19 @@ process_log_aggr ()
 
     #echo "Searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
 
-    ensure_csv_path $CSV_PATH
+    ensure_csv_path $csv_path
+
+    if $filter_log_module; then
+        echo "INFO: filtering log using '$LOG_MODULE' (script=$(get_script_name))"
+        logfile=$(filter_log $logfile $LOG_MODULE)
+    fi
+
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
     declare -a cols=( $(get_categories $catcmd $logfile "$cols_expr") )
     (( ${#cols[@]} )) && [[ -n ${cols[0]} ]] || return 0
 
-    init_dataset $DATA_TMP "" ${cols[@]}
+    init_dataset $data_tmp "" ${cols[@]}
     flag=$(mktemp)
     echo "0" > $flag
     for c in ${cols[@]}; do
@@ -52,7 +61,7 @@ process_log_aggr ()
             declare -a split=( $row )
             # round to nearest 10 minutes
             t=${split[0]::4}0
-            path=${DATA_TMP}/${t//:/_}
+            path=${data_tmp}/${t//:/_}
             current=$(cat $path/$c)
             echo $((current+1)) > $path/$c
             echo "1" > $flag
@@ -63,7 +72,7 @@ process_log_aggr ()
         fi
     done
     wait
-    (($(cat $flag)==1)) && create_csv $CSV_PATH $DATA_TMP
+    (($(cat $flag)==1)) && create_csv $csv_path $data_tmp
     rm $flag
 }
 

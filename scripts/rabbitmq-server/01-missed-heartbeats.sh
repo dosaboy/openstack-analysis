@@ -9,6 +9,6 @@ SCRIPT_HEADER "\[error\]"
 y_label=missed_heartbeats
 expr1="s/$EXPR_LOG_DATE\+[0-9:]+ $LOG_MODULE .+ closing AMQP connection .+ \([0-9.]+:[0-9]+ -> [0-9.]+:5672 - ([a-z0-9-]+):.+\):/\1/p"
 expr2="s/$EXPR_LOG_DATE_GROUP_TIME\+[0-9:]+ $LOG_MODULE .+ closing AMQP connection .+ \([0-9.]+:[0-9]+ -> [0-9.]+:5672 - \${INSERT}:.+\):/\1/p"
-process_log_aggr $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH "$expr1" "$expr2"
+process_log_aggr $LOG $DATA_TMP $CSV_PATH "$expr1" "$expr2" true
 
 SCRIPT_FOOTER $y_label

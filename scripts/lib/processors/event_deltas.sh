@@ -59,8 +59,10 @@ process_log_event_deltas ()
     #              name.
     #   delta_events_expr: regular expression (egrep) used to events between
     #                      the start and end of a sequence.
+    #   filter_log_module: Apply the default filter of LOG_MODULE to the
+    #                      logfile prior to searching.
 
-    (($#==7)) || { echo "ERROR: insufficient args ($#) to process_log_event_deltas()"; exit 1; }
+    (($#==8)) || { echo "ERROR: insufficient args ($#) to process_log_event_deltas()"; exit 1; }
     local logfile=$1
     local data_tmp=$2
     local csv_path=$3
@@ -68,6 +70,7 @@ process_log_event_deltas ()
     local cols_expr="$5"
     local rows_expr="$6"
     local delta_events_expr="$7"
+    local filter_log_module=$8
     local catcmd=cat
     local max_jobs=10
     local num_jobs=0
@@ -84,7 +87,13 @@ process_log_event_deltas ()
     declare -A range_start_times=()
 
     ensure_csv_path $csv_path
-    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
+
+    if $filter_log_module; then
+        echo "INFO: filtering log using '$LOG_MODULE' (script=$(get_script_name))"
+        logfile=$(filter_log $logfile $LOG_MODULE)
+    fi
+
+    file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
     # get sequence end
     ends=$(mktemp -p $data_tmp)
@@ -99,20 +108,20 @@ process_log_event_deltas ()
     # line numbers of sequence ends
     declare -n LN_DARRAY_STORE="range_ends"
     declare -n TIMINGS_DARRAY_STORE="range_end_times"
-    get_line_numbers "$rows_expr" $ends $LOG
+    get_line_numbers "$rows_expr" $ends $logfile
     (( ${#range_ends[@]} )) || return 0
 
     # line numbers of sequence starts
     declare -n LN_DARRAY_STORE="range_starts"
     declare -n TIMINGS_DARRAY_STORE="range_start_times"
-    get_line_numbers "$cols_expr" $starts $LOG
+    get_line_numbers "$cols_expr" $starts $logfile
     (( ${#range_starts[@]} )) || return 0
 
     for resource in ${!range_starts[@]}; do
         start=${range_starts[$resource]}
         [[ ${range_ends[$resource]:-null} = null ]] && continue
         end=${range_ends[$resource]}
-        event_deltas[$resource]=$(get_num_matching_lines $start $end "$delta_events_expr" $LOG)
+        event_deltas[$resource]=$(get_num_matching_lines $start $end "$delta_events_expr" $logfile)
     done
 
     init_dataset_multi_date $y_label $data_tmp ${range_start_times[@]}

@@ -14,6 +14,6 @@ SCRIPT_HEADER oslo.messaging._drivers.impl_rabbit
 
 expr1=""
 expr2="s/$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $LOG_MODULE \[.+\] A recoverable connection\/channel error occurred, trying to reconnect: Too many heartbeats missed/\1/p"
-process_log_aggr $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH "$expr1" "$expr2"
+process_log_aggr $LOG $DATA_TMP $CSV_PATH "$expr1" "$expr2" true
 
 SCRIPT_FOOTER missed-rabbitmq-heartbeats

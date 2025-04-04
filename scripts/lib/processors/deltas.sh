@@ -54,13 +54,16 @@ process_log_deltas ()
     #              This expression will typically be the same as cols_expr
     #              but with an $INSERT variable in place of the column
     #              name.
+    #   filter_log_module: Apply the default filter of LOG_MODULE to the
+    #                      logfile prior to searching.
 
-    (($#==5)) || { echo "ERROR: insufficient args ($#) to process_log_deltas()"; exit 1; }
+    (($#==6)) || { echo "ERROR: insufficient args ($#) to process_log_deltas()"; exit 1; }
     local logfile=$1
     local data_tmp=$2
     local csv_path=$3
     local cols_expr="$4"
     local rows_expr="$5"
+    local filter_log_module=$6
     local catcmd=cat
     local max_jobs=10
     local num_jobs=0
@@ -73,6 +76,12 @@ process_log_deltas ()
     #echo "Searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
 
     ensure_csv_path $csv_path
+
+    if $filter_log_module; then
+        echo "INFO: filtering log using '$LOG_MODULE' (script=$(get_script_name))"
+        logfile=$(filter_log $logfile $LOG_MODULE)
+    fi
+
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
     starts=$(mktemp -p $data_tmp)
