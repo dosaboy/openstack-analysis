@@ -1,9 +1,11 @@
 process_log_aggr ()
 {
     # Description: 
-    #   Identify one more resources/columns then for each get
-    #   values within a 10 minute window and add/aggregate
-    #   them.
+    #   Identify one more resources/columns then for every 10 minute window,
+    #   tally the occurence of each resource OR optionally save theie value.
+    #   The default tally behaviour is used if the search results contain a
+    #   single group (time) and if there is a second group that is used as the
+    #   value to save.
     #
     #   The resulting csv data will have one y-axis column per
     #   resource and a row for every ten minutes of time.
@@ -62,8 +64,14 @@ process_log_aggr ()
             # round to nearest 10 minutes
             t=${split[0]::4}0
             path=${data_tmp}/${t//:/_}
-            current=$(cat $path/$c)
-            echo $((current+1)) > $path/$c
+            if ((${#split[@]} > 1)); then
+                # if more than one result group exists use the second group as the value
+                echo ${split[1]}  > $path/$c
+            else
+                # otherwise default to a tally
+                current=$(cat $path/$c)
+                echo $((current+1)) > $path/$c
+            fi
             echo "1" > $flag
         done &
         if ((num_jobs==max_jobs)); then
