@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 #
-# Description:
+# Description: loadbalancer create time
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
