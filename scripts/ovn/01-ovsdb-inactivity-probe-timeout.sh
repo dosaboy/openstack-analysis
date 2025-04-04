@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 #
-# Description: capture api http return codes
+# Description: capture ovsdb inactivity probe timeouts
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 

@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 #
-# Description: capture api http return codes
+# Description: capture ovn northd high CPU usage
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
