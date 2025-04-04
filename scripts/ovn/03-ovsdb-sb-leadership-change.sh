@@ -4,7 +4,7 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
-# NOTE: only run this for nb logs
+# NOTE: only run this for sb logs
 [[ $LOG =~ ovsdb-server-sb.log ]] || exit 0
 
 SCRIPT_HEADER '\|raft\|'
