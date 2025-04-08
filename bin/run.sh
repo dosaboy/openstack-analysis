@@ -12,7 +12,8 @@ declare -A ENTRYPOINTS=(
     [ovn.2]=/var/log/ovn/ovsdb-server-nb.log${LOGROTATE:-.1.gz}
     [ovn.3]=/var/log/ovn/ovsdb-server-sb.log${LOGROTATE:-.1.gz}
     [ovn.4]=/var/log/ovn/ovn-northd.log${LOGROTATE:-.1.gz}
-    [neutron-api]=/var/log/neutron/neutron-server.log${LOGROTATE:-.1.gz}
+    [neutron-api.0]=/var/log/neutron/neutron-server.log${LOGROTATE:-.1.gz}
+    [neutron-api.1]=/var/log/apache2/other_vhosts_access.log${LOGROTATE:-.1}
     [nova-compute]=/var/log/nova/nova-compute.log${LOGROTATE:-.1}
     [nova-api]=/var/log/nova/nova-conductor.log${LOGROTATE:-.1}
     [rabbitmq-server]=/var/log/rabbitmq/rabbit@*.log${LOGROTATE:-.1}
@@ -35,9 +36,8 @@ for sos in $(ls -d $SOS_ROOT); do
             echo "INFO: skipping $mod scripts"
             continue
         fi
-        export LOG=$ROOT${ENTRYPOINTS[$mod]}
         # If matches more then one file take the first
-        LOG=$(ls $LOG 2>/dev/null| head -n1)
+        export LOG=$(ls $ROOT${ENTRYPOINTS[$mod]} 2>/dev/null| head -n1)
         [[ -e $LOG ]] && $SCRIPT_ROOT/${mod%.*}/__all__.sh
     done
 done
