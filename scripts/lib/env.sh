@@ -7,6 +7,7 @@ export SOS_ROOT=
 export PLOT_GRAPHS=false
 export OUTPUT_PATH=results
 export AGENT_SCRIPTS=
+export SCRIPT_OVERRIDE=
 export LOGROTATE=
 
 usage ()
@@ -25,6 +26,8 @@ SYNOPSIS
         Filter a specific host.
     --agent
         Run scripts for a specific agent.
+    --script
+        Run a specific script
     --path
         Path to one or more unpacked sosreport.
     --plot
@@ -59,6 +62,10 @@ while (($# > 0)); do
             ;;
         --plot)
             PLOT_GRAPHS=true
+            ;;
+        --script)
+            SCRIPT_OVERRIDE=$2
+            shift
             ;;
         --logrotate)
             LOGROTATE=$2

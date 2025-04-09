@@ -73,14 +73,21 @@ process_log_aggr2 ()
     for row in "${rows[@]}"; do
         rownum=$((rownum+=1))
         declare -a split=( $row )
+        # Result group meanings:
+        #  [0]: datetime (mandatory)
+        #  [1]: column name (mandatory)
+        #  [2]: value (optional)
         # round time to nearest 10 minutes
         t=${split[0]::4}0
         col=${split[1]}
         ## CACHE
         if [[ $_time = $t ]]; then
+            # If a value group exists save the max.
             if ((${#split[@]} > 2)); then
-                # if more than one result group exists use the second group as the value
-                cache[$col]=${split[2]}
+                if [[ ${cache[$col]:-null} = null ]] || \
+                        [[ ${split[2]} > ${cache[$col]} ]]; then
+                    cache[$col]=${split[2]}
+                fi
             else
                 cache[$col]=$((${cache[$col]:-0}+1))
             fi
