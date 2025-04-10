@@ -19,6 +19,7 @@ declare -A ENTRYPOINTS=(
     [rabbitmq-server]=/var/log/rabbitmq/rabbit@*.log${LOGROTATE:-.1}
 )
 
+mkdir -p $OUTPUT_PATH
 export JOBS_DEFS_DIR=$(mktemp -d --suffix -job-defs)
 for sos in $(ls -d $SOS_ROOT); do
     if [[ -n $HOST_OVERRIDE ]]; then
