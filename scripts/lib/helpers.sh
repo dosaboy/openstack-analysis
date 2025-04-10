@@ -145,7 +145,7 @@ get_results_dir ()
     script_name=$(get_script_name)
     path=$OUTPUT_PATH/data/$mod_name/$script_name
 
-    mkdir -p $path
+    flock $LOCKFILE mkdir -p $path
     echo $path
 }
 

@@ -19,6 +19,7 @@ declare -A ENTRYPOINTS=(
     [rabbitmq-server]=/var/log/rabbitmq/rabbit@*.log${LOGROTATE:-.1}
 )
 
+export JOBS_DEFS_DIR=$(mktemp -d --suffix -job-defs)
 for sos in $(ls -d $SOS_ROOT); do
     if [[ -n $HOST_OVERRIDE ]]; then
         echo $sos| grep -q $HOST_OVERRIDE || continue
@@ -38,9 +39,23 @@ for sos in $(ls -d $SOS_ROOT); do
         fi
         # If matches more then one file take the first
         export LOG=$(ls $ROOT${ENTRYPOINTS[$mod]} 2>/dev/null| head -n1)
+        [[ -n $LOG ]] || continue
+        if [[ ${LOG::1} != / ]]; then
+            LOG="$(pwd)/$LOG"
+        fi
         [[ -e $LOG ]] && $SCRIPT_ROOT/${mod%.*}/__all__.sh
     done
 done
+
+[[ -d $JOBS_DEFS_DIR ]] || { echo "ERROR: jobs path not found"; exit 1; }
+PIDS=()
+for job in $(find $JOBS_DEFS_DIR -name run.sh); do
+    $job &
+    PIDS+=( $! )
+    (( ${#PIDS[@]} % MAX_CONCURRENT_JOBS == 0 )) && { echo waiting; wait; }
+done
+wait
+rm -rf $JOBS_DEFS_DIR
 
 $PLOT_GRAPHS || exit 0
 $BIN_ROOT/plot.sh --host "$HOST_OVERRIDE"

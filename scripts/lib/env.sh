@@ -6,9 +6,11 @@ export HOST_OVERRIDE=
 export SOS_ROOT=
 export PLOT_GRAPHS=false
 export OUTPUT_PATH=results
+export LOCKFILE=$OUTPUT_PATH/lock
 export AGENT_SCRIPTS=
 export SCRIPT_OVERRIDE=
 export LOGROTATE=
+export MAX_CONCURRENT_JOBS=8
 
 usage ()
 {
@@ -28,6 +30,8 @@ SYNOPSIS
         Run scripts for a specific agent.
     --script
         Run a specific script
+    -j|--jobs
+        Maximum number of jobs to run in parallel. Default is $MAX_CONCURRENT_JOBS.
     --path
         Path to one or more unpacked sosreport.
     --plot
@@ -50,6 +54,10 @@ while (($# > 0)); do
             ;;
         --agent)
             AGENT_SCRIPTS=$2
+            shift
+            ;;
+        -j|--jobs)
+            MAX_CONCURRENT_JOBS=$2
             shift
             ;;
         --host)
