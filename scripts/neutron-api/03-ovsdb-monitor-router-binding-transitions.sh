@@ -6,8 +6,8 @@
 
 SCRIPT_HEADER neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovsdb_monitor
 
-expr1="$EXPR_LOG_DATE $EXPR_LOG_CONTEXT Router (\S+) is bound to host \S+"
-expr2="$EXPR_LOG_DATE_GROUP_TIME $EXPR_LOG_CONTEXT Router \$INSERT is bound to host \S+"
-process_log_aggr2 $LOG $DATA_TMP $CSV_PATH "$expr1" "$expr2" 1 true
+col_expr="$EXPR_LOG_DATE $EXPR_LOG_CONTEXT Router (\S+) is bound to host \S+"
+row_expr="$EXPR_LOG_DATE_GROUP_TIME $EXPR_LOG_CONTEXT Router \$INSERT is bound to host \S+"
+process_log_aggr2 $LOG $DATA_TMP $CSV_PATH "$col_expr" "$row_expr" 1 true
 
 SCRIPT_FOOTER router-bound-to-host

@@ -93,8 +93,8 @@ process_log ()
 
 SCRIPT_HEADER oslo_concurrency.lockutils
 
-expr1="s/$EXPR_LOG_DATE [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
-expr2="s/$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\1/p"
-process_log $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH "$expr1" "$expr2"
+col_expr="s/$EXPR_LOG_DATE [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
+row_expr="s/$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\1/p"
+process_log $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH "$col_expr" "$row_expr"
 
 SCRIPT_FOOTER max-lock-held-time

@@ -9,8 +9,8 @@
 
 SCRIPT_HEADER '\|bfd(\S+)?\|'
 
-expr1='s/^[0-9-]+T([0-9:]+)\.[0-9]+Z.+\|bfd(\S+)?\|\S+\|(\S+): BFD state change: (\S+)/\1/p'
+row_expr='s/^[0-9-]+T([0-9:]+)\.[0-9]+Z.+\|bfd(\S+)?\|\S+\|(\S+): BFD state change: (\S+)/\1/p'
 y_label=ovs-bfd-state-change
-process_log_tally $LOG $DATA_TMP $CSV_PATH "$expr1" true $y_label
+process_log_tally $LOG $DATA_TMP $CSV_PATH "$row_expr" true $y_label
 
 SCRIPT_FOOTER $y_label

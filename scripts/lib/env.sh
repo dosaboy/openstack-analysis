@@ -76,7 +76,7 @@ while (($# > 0)); do
             shift
             ;;
         --logrotate)
-            LOGROTATE=$2
+            LOGROTATE=".log$2"
             shift
             ;;
         -*)

@@ -6,8 +6,8 @@
 
 SCRIPT_HEADER os_vif
 
-expr1="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ Plugging vif .+"
-expr2="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ Successfully plugged vif .+"
-process_log_deltas $LOG $DATA_TMP $CSV_PATH "$expr1" "$expr2" true
+col_expr="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ Plugging vif .+"
+row_expr="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ Successfully plugged vif .+"
+process_log_deltas $LOG $DATA_TMP $CSV_PATH "$col_expr" "$row_expr" true
 
 SCRIPT_FOOTER os-vif-plug-time

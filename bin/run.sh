@@ -6,17 +6,17 @@ export SCRIPT_ROOT=$BIN_ROOT/../scripts
 [[ -n $SOS_ROOT ]] || { echo "ERROR: sos root required (--path)"; exit 1; }
 
 declare -A ENTRYPOINTS=(
-    [octavia]=/var/log/octavia/octavia-worker.log${LOGROTATE:-.1}
-    [ovn.0]=/var/log/openvswitch/ovsdb-server.log${LOGROTATE:-.1.gz}
-    [ovn.1]=/var/log/openvswitch/ovs-vswitchd.log${LOGROTATE:-.1.gz}
-    [ovn.2]=/var/log/ovn/ovsdb-server-nb.log${LOGROTATE:-.1.gz}
-    [ovn.3]=/var/log/ovn/ovsdb-server-sb.log${LOGROTATE:-.1.gz}
-    [ovn.4]=/var/log/ovn/ovn-northd.log${LOGROTATE:-.1.gz}
-    [neutron-api.0]=/var/log/neutron/neutron-server.log${LOGROTATE:-.1.gz}
-    [neutron-api.1]=/var/log/apache2/other_vhosts_access.log${LOGROTATE:-.1}
-    [nova-compute]=/var/log/nova/nova-compute.log${LOGROTATE:-.1}
-    [nova-api]=/var/log/nova/nova-conductor.log${LOGROTATE:-.1}
-    [rabbitmq-server]=/var/log/rabbitmq/rabbit@*.log${LOGROTATE:-.1}
+    [octavia]=/var/log/octavia/octavia-worker${LOGROTATE:-.log.1}
+    [ovn.0]=/var/log/openvswitch/ovsdb-server${LOGROTATE:-.log.1.gz}
+    [ovn.1]=/var/log/openvswitch/ovs-vswitchd${LOGROTATE:-.log.1.gz}
+    [ovn.2]=/var/log/ovn/ovsdb-server-nb${LOGROTATE:-.log.1.gz}
+    [ovn.3]=/var/log/ovn/ovsdb-server-sb${LOGROTATE:-.log.1.gz}
+    [ovn.4]=/var/log/ovn/ovn-northd${LOGROTATE:-.log.1.gz}
+    [neutron-api.0]=/var/log/neutron/neutron-server${LOGROTATE:-.log.1.gz}
+    [neutron-api.1]=/var/log/apache2/other_vhosts_access${LOGROTATE:-.log.1}
+    [nova-compute]=/var/log/nova/nova-compute${LOGROTATE:-.log.1}
+    [nova-api]=/var/log/nova/nova-conductor${LOGROTATE:-.log.1}
+    [rabbitmq-server]=/var/log/rabbitmq/rabbit@*${LOGROTATE:-.log.1}
 )
 
 mkdir -p $OUTPUT_PATH
