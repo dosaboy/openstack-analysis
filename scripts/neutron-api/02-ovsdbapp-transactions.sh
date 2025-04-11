@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for neutron-server logs
+[[ $LOG =~ neutron-server.log ]] || exit 0
+
 SCRIPT_HEADER ovsdbapp.backend.ovs_idl.transaction
 
 y_label=txn-command

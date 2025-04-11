@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .imgbox {
+            display: grid;
+            height: 100%;
+        }
+        .center-fit {
+            max-width: 100%;
+            max-height: 100vh;
+            margin: auto;
+        }
+
+    </style>
+</head>
+
+<body>
+Expand to see graphs from each host grouped by agent type:
+<br>
+<br>
+
+<div class=imgbox>
+
+{% for agent, scripts in agents.items() -%}
+<details>
+<summary><b>{{ agent }}</b></summary>
+{% for script, info in scripts.items() -%}
+<details>
+{% for item in info -%}
+<summary>{{ script }}</summary>
+<p>{{ item['host'] }}</p>
+<img src={{ item['path'] }} class=center-fit>
+{% endfor %}
+</details>
+{% endfor %}
+
+</details>
+{%- endfor %}
+
+<div>
+
+</body>
+</html>

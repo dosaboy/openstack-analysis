@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for neutron-server logs
+[[ $LOG =~ neutron-server.log ]] || exit 0
+
 SCRIPT_HEADER ovsdbapp.backend.ovs_idl.command
 
 col_expr="$EXPR_LOG_DATE [0-9]+ \w+ $LOG_MODULE ovsdbapp.backend.ovs_idl.idlutils.RowNotFound: Cannot find (\w+) with name=.+"

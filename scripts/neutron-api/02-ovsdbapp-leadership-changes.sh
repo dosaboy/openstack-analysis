@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for neutron-server logs
+[[ $LOG =~ neutron-server.log ]] || exit 0
+
 SCRIPT_HEADER ovsdbapp.backend.ovs_idl.vlog
 
 col_expr="$EXPR_LOG_DATE $EXPR_LOG_CONTEXT ssl:([0-9:.]+): clustered database server is not cluster leader; trying another server"

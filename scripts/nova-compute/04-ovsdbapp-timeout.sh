@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for nova-compute logs
+[[ $LOG =~ nova-compute.log ]] || exit 0
+
 SCRIPT_HEADER nova.compute.manager
 
 col_expr="$EXPR_LOG_DATE $EXPR_LOG_CONTEXT .+ ovsdbapp.exceptions.TimeoutException: Commands \[(\w+)\(.+\].+"

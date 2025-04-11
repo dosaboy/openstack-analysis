@@ -6,6 +6,9 @@
 
 skip "$(basename $0) can take a very long time to run - enable manually if needed"
 
+# NOTE: only run this for neutron-server logs
+[[ $LOG =~ neutron-server.log ]] || exit 0
+
 SCRIPT_HEADER neutron.wsgi
 
 col_expr="$EXPR_LOG_DATE $EXPR_LOG_CONTEXT [0-9.]+\,[0-9.]+ \\\"[A-Z]{3,6} /[a-z0-9.]+/[^/]+\?.*[/ ].+\" status: ([0-9]+) .+"

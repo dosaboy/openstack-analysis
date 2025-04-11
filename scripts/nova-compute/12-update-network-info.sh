@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for nova-compute logs
+[[ $LOG =~ nova-compute.log ]] || exit 0
+
 SCRIPT_HEADER nova.network.neutron
 
 col_expr="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT_GROUP_REQ $EXPR_LOG_INSTANCE_UUID Building network info cache for instance _get_instance_nw_info.+"

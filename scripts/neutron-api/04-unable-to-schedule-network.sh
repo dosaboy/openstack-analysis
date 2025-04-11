@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for neutron-server logs
+[[ $LOG =~ neutron-server.log ]] || exit 0
+
 SCRIPT_HEADER neutron.api.rpc.agentnotifiers.dhcp_rpc_agent_api
 
 y_label=unable-to-schedule-network-events

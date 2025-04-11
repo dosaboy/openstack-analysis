@@ -7,11 +7,11 @@ export SCRIPT_ROOT=$BIN_ROOT/../scripts
 
 declare -A ENTRYPOINTS=(
     [octavia]=/var/log/octavia/octavia-worker${LOGROTATE:-.log.1}
-    [ovn.0]=/var/log/openvswitch/ovsdb-server${LOGROTATE:-.log.1.gz}
-    [ovn.1]=/var/log/openvswitch/ovs-vswitchd${LOGROTATE:-.log.1.gz}
-    [ovn.2]=/var/log/ovn/ovsdb-server-nb${LOGROTATE:-.log.1.gz}
-    [ovn.3]=/var/log/ovn/ovsdb-server-sb${LOGROTATE:-.log.1.gz}
-    [ovn.4]=/var/log/ovn/ovn-northd${LOGROTATE:-.log.1.gz}
+    [ovs.0]=/var/log/openvswitch/ovsdb-server${LOGROTATE:-.log.1.gz}
+    [ovs.1]=/var/log/openvswitch/ovs-vswitchd${LOGROTATE:-.log.1.gz}
+    [ovn-central.0]=/var/log/ovn/ovsdb-server-nb${LOGROTATE:-.log.1.gz}
+    [ovn-central.1]=/var/log/ovn/ovsdb-server-sb${LOGROTATE:-.log.1.gz}
+    [ovn-central.2]=/var/log/ovn/ovn-northd${LOGROTATE:-.log.1.gz}
     [neutron-api.0]=/var/log/neutron/neutron-server${LOGROTATE:-.log.1.gz}
     [neutron-api.1]=/var/log/apache2/other_vhosts_access${LOGROTATE:-.log.1}
     [nova-compute]=/var/log/nova/nova-compute${LOGROTATE:-.log.1}

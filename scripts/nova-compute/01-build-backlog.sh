@@ -9,6 +9,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for nova-compute logs
+[[ $LOG =~ nova-compute.log ]] || exit 0
+
 SCRIPT_HEADER nova.compute.manager
 
 col_expr="$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT $EXPR_LOG_INSTANCE_UUID_GROUP_UUID Starting instance\.\.\. _do_build_and_run_instance.*"

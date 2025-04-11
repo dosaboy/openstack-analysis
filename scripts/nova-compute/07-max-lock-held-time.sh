@@ -4,6 +4,8 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for nova-compute logs
+[[ $LOG =~ nova-compute.log ]] || exit 0
 
 is_uuid ()
 {

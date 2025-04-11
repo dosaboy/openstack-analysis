@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for neutron-server logs
+[[ $LOG =~ neutron-server.log ]] || exit 0
+
 SCRIPT_HEADER neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovsdb_monitor
 
 col_expr="$EXPR_LOG_DATE $EXPR_LOG_CONTEXT Router (\S+) is bound to host \S+"

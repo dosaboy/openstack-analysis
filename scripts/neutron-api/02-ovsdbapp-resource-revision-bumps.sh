@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for neutron-server logs
+[[ $LOG =~ neutron-server.log ]] || exit 0
+
 SCRIPT_HEADER neutron.db.ovn_revision_numbers_db
 
 col_expr="$EXPR_LOG_DATE $EXPR_LOG_CONTEXT Successfully bumped revision number for resource \S+ \(type: (\S+)\) to [0-9]+"

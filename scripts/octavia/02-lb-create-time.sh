@@ -4,6 +4,9 @@
 #
 . $SCRIPT_ROOT/lib/helpers.sh
 
+# NOTE: only run this for octavia-worker logs
+[[ $LOG =~ octavia-worker.log ]] || exit 0
+
 SCRIPT_HEADER octavia.controller.worker.v1.tasks.database_tasks
 
 col_expr="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME [0-9]+ .+ \[-\] Creating load balancer '([a-z0-9-]+)'\.+"
