@@ -33,18 +33,19 @@ for sos in $(ls -d $SOS_ROOT); do
         echo "WARNING: could not determine hostname in $ROOT - using $HOSTNAME"
     fi
 
-    for mod in ${!ENTRYPOINTS[@]}; do
-        if [[ -n $AGENT_SCRIPTS ]] && [[ $AGENT_SCRIPTS != $mod ]]; then
-            echo "INFO: skipping $mod scripts"
+    for agent in ${!ENTRYPOINTS[@]}; do
+        if [[ -n $AGENT_SCRIPTS ]] && [[ $AGENT_SCRIPTS != $agent ]]; then
+            echo "INFO: skipping $agent scripts"
             continue
         fi
+        export AGENT_NAME=${agent%.*}
         # If matches more then one file take the first
-        export LOG=$(ls $ROOT${ENTRYPOINTS[$mod]} 2>/dev/null| head -n1)
+        export LOG=$(ls $ROOT${ENTRYPOINTS[$agent]} 2>/dev/null| head -n1)
         [[ -n $LOG ]] || continue
         if [[ ${LOG::1} != / ]]; then
             LOG="$(pwd)/$LOG"
         fi
-        [[ -e $LOG ]] && $SCRIPT_ROOT/${mod%.*}/__all__.sh
+        [[ -e $LOG ]] && $SCRIPT_ROOT/$AGENT_NAME/__all__.sh
     done
 done
 

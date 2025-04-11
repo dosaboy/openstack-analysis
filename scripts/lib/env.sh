@@ -6,7 +6,6 @@ export HOST_OVERRIDE=
 export SOS_ROOT=
 export PLOT_GRAPHS=false
 export OUTPUT_PATH=results
-export LOCKFILE=$OUTPUT_PATH/lock
 export AGENT_SCRIPTS=
 export SCRIPT_OVERRIDE=
 export LOGROTATE=
@@ -34,6 +33,8 @@ SYNOPSIS
         Maximum number of jobs to run in parallel. Default is $MAX_CONCURRENT_JOBS.
     --path
         Path to one or more unpacked sosreport.
+    --output
+        Output path for data and graphs. Default is $OUTPUT_PATH
     --plot
         Plot graphs from CSV data once complete.
     --logrotate
@@ -68,6 +69,10 @@ while (($# > 0)); do
             SOS_ROOT=$2
             shift
             ;;
+        --output)
+            OUTPUT_PATH=$2
+            shift
+            ;;
         --plot)
             PLOT_GRAPHS=true
             ;;
@@ -86,4 +91,6 @@ while (($# > 0)); do
     esac
     shift
 done
+
+export LOCKFILE=$OUTPUT_PATH/lock
 

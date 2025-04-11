@@ -1,4 +1,5 @@
 matplotlib
+jinja2
 numpy
 pandas
 pyyaml

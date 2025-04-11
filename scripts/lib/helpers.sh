@@ -113,6 +113,7 @@ ensure_csv_path ()
     if [[ -e $path ]]; then
         if ! $OVERWRITE_CSV; then
             echo "$path already exists and overwrite=false - skipping"
+            write_meta $RESULTS_DIR time
             cleanup $DATA_TMP $CSV_PATH
             exit 0
         fi
@@ -123,11 +124,24 @@ ensure_csv_path ()
 
 write_meta ()
 {
-    local DOUT=$1
-    local X_LABEL=$2
-    local Y_LABEL=$3
+    local dout=$1
+    local x_label=$2
+    local y_label=${3:-""}
 
-    echo -e "xlabel: $X_LABEL\nylabel: $Y_LABEL\n" > ${DOUT}/meta.yaml
+    outpath=${dout}/meta.yaml
+    # if no ylabel and meta already exists, attempt to get existing and update.
+    if [[ -z $y_label ]]; then
+        if [[ -e $outpath ]]; then
+            y_label=$(sed -rn 's/ylabel: (\S+)/\1/p' $outpath)
+            [[ -n $y_label ]] || return
+        else
+            return
+        fi
+    fi
+
+    echo -e "xlabel: $x_label" > $outpath
+    echo -e "ylabel: $y_label" >> $outpath
+    echo -e "agent: $AGENT_NAME" >> $outpath
 }
 
 get_script_name ()

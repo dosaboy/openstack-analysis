@@ -2,12 +2,14 @@
 import argparse
 import glob
 import os
+import sys
 from collections import UserDict
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import yaml
+from jinja2 import FileSystemLoader, Environment
 
 
 class PlotSettings(UserDict):
@@ -50,11 +52,49 @@ class PLOT():
     def data_files(self):
         return glob.glob(os.path.join(self.args.data_path, '*/*/*.csv'))
 
+    @staticmethod
+    def get_graph_name(path):
+        return os.path.basename(path).partition('.')[0]
+
     def run(self):
         for path in self.data_files:
-            name = os.path.basename(path).partition('.')[0]
-            print(f"Plotting data for {name} ({path})")
-            self.stacked(name, pd.read_csv(path), self.get_meta(path))
+            self.stacked(path)
+
+        path = os.path.join(os.getcwd(), 'index.html')
+        print(f"writing html to {path}")
+        with open(path, 'w', encoding='utf-8') as fd:
+            fd.write(self.render())
+
+    @property
+    def script_root(self):
+        return os.path.dirname(sys.argv[0])
+
+    def render(self):
+        context = {'agents': {}}
+        for path in self.data_files:
+            meta = self.get_meta(path)
+            agent = meta.get('agent', 'unknown-agent')
+            if agent not in context['agents']:
+                context['agents'][agent] = {}
+
+            host, _, script = os.path.basename(path).partition('_')
+            script = script.partition('.csv')[0]
+            if script not in context['agents'][agent]:
+                context['agents'][agent][script] = []
+
+            context['agents'][agent][script].append(
+                {'path': self.get_output_path(self.get_graph_name(path)),
+                 'host': host})
+
+        # jinja 2.10.x really needs this to be a str and e.g. not a PosixPath
+        templates_dir = str(self.script_root)
+        if not os.path.isdir(templates_dir):
+            raise FileNotFoundError(
+                f"jinja templates directory not found: '{templates_dir}'")
+
+        env = Environment(loader=FileSystemLoader(templates_dir))
+        template = env.get_template('index.html.j2')
+        return template.render(context)
 
     @staticmethod
     def x_data(csv):
@@ -69,8 +109,16 @@ class PLOT():
         b += np.timedelta64(10, 'm')
         return np.arange(a, b, np.timedelta64(10, 'm'))
 
-    def stacked(self, name, csv, meta, use_bar=False):
-        output = os.path.join(self.get_output_dir(name), f"{name}.png")
+    def get_output_path(self, name):
+        return os.path.join(self.get_output_dir(name), f"{name}.png")
+
+    def stacked(self, path, use_bar=False):
+        name = self.get_graph_name(path)
+        print(f"Plotting data for {name} ({path})")
+        csv = pd.read_csv(path)
+        meta = self.get_meta(path)
+
+        output = self.get_output_path(name)
         if os.path.exists(output) and not self.args.overwrite:
             print(f"INFO: {output} already exists - use --overwrite to "
                   "recreate")
