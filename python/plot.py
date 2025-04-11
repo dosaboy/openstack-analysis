@@ -60,8 +60,8 @@ class PLOT():
         for path in self.data_files:
             self.stacked(path)
 
-        path = os.path.join(os.getcwd(), 'index.html')
-        print(f"writing html to {path}")
+        path = os.path.join(self.args.output_path, 'index.html')
+        print(f"INFO: saving html page of all graphs to {path}")
         with open(path, 'w', encoding='utf-8') as fd:
             fd.write(self.render())
 
@@ -82,9 +82,10 @@ class PLOT():
             if script not in context['agents'][agent]:
                 context['agents'][agent][script] = []
 
+            path = self.get_output_path(self.get_graph_name(path))
+            path = path.partition('/')[2]
             context['agents'][agent][script].append(
-                {'path': self.get_output_path(self.get_graph_name(path)),
-                 'host': host})
+                {'path': path, 'host': host})
 
         # jinja 2.10.x really needs this to be a str and e.g. not a PosixPath
         templates_dir = str(self.script_root)
