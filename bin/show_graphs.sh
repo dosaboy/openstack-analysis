@@ -1,5 +1,4 @@
 #!/bin/bash -eu
-HOST=${1:-""}
 BIN_ROOT=$(dirname $(readlink --canonicalize $0))
 SCRIPT_ROOT=$BIN_ROOT/../scripts
 . $SCRIPT_ROOT/lib/env.sh
@@ -10,9 +9,13 @@ if ! [[ -d $GRAPHS_PATH ]]; then
     exit 1
 fi
 
+graphs=()
 for host in $(ls $GRAPHS_PATH); do
-    if [[ -n $HOST ]]; then
-        [[ $HOST == $host ]] || continue
+    if (( ${#HOST_OVERRIDE[@]} )); then
+        echo ${HOST_OVERRIDE[@]}| egrep -q "( |^)$host( |\$)" || continue
+        graphs+=( $(find $GRAPHS_PATH/$host -name \*.png) )
+    else
+        find $GRAPHS_PATH/$host -name \*.png| xargs firefox
     fi
-    find $GRAPHS_PATH/$host -name \*.png| xargs firefox
 done
+((${#graphs[@]})) && firefox ${graphs[@]}

@@ -16,11 +16,11 @@ ARGS=( --data-path $DATA_PATH --output-path $OUTPUT_PATH )
 if $OVERWRITE_CSV; then
     ARGS+=( --overwrite )
 fi
-if [[ -n $HOST_OVERRIDE ]]; then
-    ARGS+=( --host $HOST_OVERRIDE )
-fi
-if [[ -n $HOST_OVERRIDE ]]; then
-    $OVERWRITE_CSV && rm -f $GRAPHS_PATH/$HOST_OVERRIDE/*
+if (( ${#HOST_OVERRIDE[@]} )); then
+    for host in ${HOST_OVERRIDE[@]}; do
+        ARGS+=( --host $host )
+        $OVERWRITE_CSV && rm -f $GRAPHS_PATH/$host/*
+    done
 else
     $OVERWRITE_CSV && rm -rf $GRAPHS_PATH/*
 fi

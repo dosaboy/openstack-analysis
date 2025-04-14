@@ -56,8 +56,18 @@ class PLOT():
     def get_graph_name(path):
         return os.path.basename(path).partition('.')[0]
 
+    @staticmethod
+    def get_script_and_hostname(path):
+        host, _, script = os.path.basename(path).partition('_')
+        return host, script
+
     def run(self):
         for path in self.data_files:
+            if self.args.host:
+                host, _ = self.get_script_and_hostname(path)
+                if host not in self.args.host:
+                    continue
+
             self.stacked(path)
 
         path = os.path.join(self.args.output_path, 'index.html')
@@ -77,7 +87,7 @@ class PLOT():
             if agent not in context['agents']:
                 context['agents'][agent] = {}
 
-            host, _, script = os.path.basename(path).partition('_')
+            host, script = self.get_script_and_hostname(path)
             script = script.partition('.csv')[0]
             if script not in context['agents'][agent]:
                 context['agents'][agent][script] = []
@@ -163,5 +173,5 @@ if __name__ == "__main__":
     parser.add_argument('--overwrite', action='store_true', default=False)
     parser.add_argument('--output-path', type=str, required=True)
     parser.add_argument('--data-path', type=str, required=True)
-    parser.add_argument('--host', type=str, required=False)
+    parser.add_argument('--host', action='append', required=False)
     PLOT(parser.parse_args()).run()

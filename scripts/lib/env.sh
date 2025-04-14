@@ -2,7 +2,7 @@
 
 # GLOBALS
 export OVERWRITE_CSV=false
-export HOST_OVERRIDE=
+export HOST_OVERRIDE=()
 export SOS_ROOT=
 export PLOT_GRAPHS=false
 export OUTPUT_PATH=results
@@ -24,7 +24,7 @@ SYNOPSIS
     --overwrite
         Overwrite existing CSV files. Defaults to false.
     --host
-        Filter a specific host.
+        Filter a specific host. Can be specified multiple times.
     --agent
         Run scripts for a specific agent.
     --script
@@ -62,7 +62,7 @@ while (($# > 0)); do
             shift
             ;;
         --host)
-            HOST_OVERRIDE=$2
+            HOST_OVERRIDE+=( $2 )
             shift
             ;;
         --path)

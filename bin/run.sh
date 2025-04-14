@@ -22,8 +22,8 @@ declare -A ENTRYPOINTS=(
 mkdir -p $OUTPUT_PATH
 export JOBS_DEFS_DIR=$(mktemp -d --suffix -job-defs)
 for sos in $(ls -d $SOS_ROOT); do
-    if [[ -n $HOST_OVERRIDE ]]; then
-        echo $sos| grep -q $HOST_OVERRIDE || continue
+    if (( ${#HOST_OVERRIDE[@]} )); then
+        echo $sos| egrep -q $(echo ${HOST_OVERRIDE[@]}| tr ' ' '|' ) || continue
     fi
     export ROOT=$sos
     if [[ -r $ROOT/hostname ]]; then
@@ -60,4 +60,4 @@ wait
 rm -rf $JOBS_DEFS_DIR
 
 $PLOT_GRAPHS || exit 0
-$BIN_ROOT/plot.sh --host "$HOST_OVERRIDE"
+$BIN_ROOT/plot.sh $(echo ${HOST_OVERRIDE[@]}| sed -r 's/(\w+)/--host \1/g' )
