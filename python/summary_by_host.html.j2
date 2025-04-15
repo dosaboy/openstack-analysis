@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        details summary { 
+          cursor: pointer;
+          margin-top: 2px;
+          margin-bottom: 2px;
+        }
+        details summary.outer { 
+          font-weight: bold;
+        }
+        details summary.inner { 
+          margin-left: 15px;
+        }
+        .imgbox {
+            display: grid;
+            height: 100%;
+        }
+        .center-fit {
+            max-width: 80%;
+            max-height: 100vh;
+            margin: auto;
+        }
+        .content {
+            margin: 30px;;
+        }
+    </style>
+</head>
+
+<body>
+Expand to see graphs by host:
+<br>
+<br>
+
+<div class=imgbox>
+
+{% for host, scripts in hosts.items() -%}
+<details>
+<summary class=outer>{{ host }}</summary>
+{% for script, info in scripts.items() -%}
+<details>
+<summary class=inner>{{ script }}</summary>
+{% for item in info -%}
+<div class=content>
+<p>{{ item['mod'] }}</p>
+<img src={{ item['path'] }} class=center-fit>
+</div>
+{% endfor %}
+</details>
+{% endfor %}
+
+</details>
+{%- endfor %}
+
+<div>
+
+</body>
+</html>

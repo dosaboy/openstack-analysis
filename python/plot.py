@@ -70,17 +70,20 @@ class PLOT():
 
             self.stacked(path)
 
-        path = os.path.join(self.args.output_path, 'index.html')
-        print(f"INFO: saving html page of all graphs to {path}")
-        with open(path, 'w', encoding='utf-8') as fd:
-            fd.write(self.render())
+        for template in ['summary_by_agent.html.j2',
+                         'summary_by_host.html.j2']:
+            path = os.path.join(self.args.output_path,
+                                template.partition('.j2')[0])
+            print(f"INFO: saving html page of all graphs to {path}")
+            with open(path, 'w', encoding='utf-8') as fd:
+                fd.write(self.render(template))
 
     @property
     def script_root(self):
         return os.path.dirname(sys.argv[0])
 
-    def render(self):
-        context = {'agents': {}}
+    def get_renderer_context(self):
+        context = {'agents': {}, 'hosts': {}}
         for path in self.data_files:
             meta = self.get_meta(path)
             agent = meta.get('agent', 'unknown-agent')
@@ -88,15 +91,27 @@ class PLOT():
                 context['agents'][agent] = {}
 
             host, script = self.get_script_and_hostname(path)
+            if host not in context['hosts']:
+                context['hosts'][host] = {}
+
             script = script.partition('.csv')[0]
             if script not in context['agents'][agent]:
                 context['agents'][agent][script] = []
+
+            if script not in context['hosts'][host]:
+                context['hosts'][host][script] = []
 
             path = self.get_output_path(self.get_graph_name(path))
             path = path.partition('/')[2]
             context['agents'][agent][script].append(
                 {'path': path, 'host': host})
 
+            context['hosts'][host][script].append(
+                {'path': path, 'agent': agent})
+
+        return context
+
+    def render(self, template):
         # jinja 2.10.x really needs this to be a str and e.g. not a PosixPath
         templates_dir = str(self.script_root)
         if not os.path.isdir(templates_dir):
@@ -104,8 +119,8 @@ class PLOT():
                 f"jinja templates directory not found: '{templates_dir}'")
 
         env = Environment(loader=FileSystemLoader(templates_dir))
-        template = env.get_template('index.html.j2')
-        return template.render(context)
+        template = env.get_template(template)
+        return template.render(self.get_renderer_context())
 
     @staticmethod
     def x_data(csv):
