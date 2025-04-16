@@ -138,11 +138,12 @@ class PLOT():
     def get_output_path(self, name):
         return os.path.join(self.get_output_dir(name), f"{name}.png")
 
-    def stacked(self, path, use_bar=False):
+    def stacked(self, path):
         name = self.get_graph_name(path)
         print(f"Plotting data for {name} ({path})")
         csv = pd.read_csv(path)
         meta = self.get_meta(path)
+        use_bar = meta.get('type') == 'bar'
 
         output = self.get_output_path(name)
         if os.path.exists(output) and not self.args.overwrite:

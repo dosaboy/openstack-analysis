@@ -127,6 +127,7 @@ write_meta ()
     local dout=$1
     local x_label=$2
     local y_label=${3:-""}
+    local plot_type=${4:-bar}  # options: stacked | bar
 
     outpath=${dout}/meta.yaml
     # if no ylabel and meta already exists, attempt to get existing and update.
@@ -142,6 +143,7 @@ write_meta ()
     echo -e "xlabel: $x_label" > $outpath
     echo -e "ylabel: $y_label" >> $outpath
     echo -e "agent: $AGENT_NAME" >> $outpath
+    echo -e "type: $plot_type" >> $outpath
 }
 
 get_script_name ()
@@ -206,6 +208,7 @@ SCRIPT_HEADER ()
 SCRIPT_FOOTER ()
 {
     export Y_LABEL=$1
-    write_meta $RESULTS_DIR time $Y_LABEL
+    local plot_type=${2:-""}
+    write_meta $RESULTS_DIR time $Y_LABEL $plot_type
     cleanup $DATA_TMP $CSV_PATH
 }
