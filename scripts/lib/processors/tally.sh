@@ -14,23 +14,18 @@ process_log_tally ()
     #   data_tmp: path to temporary directory used to store data
     #   csv_path: path to output CSV file
     #   rows_expr: regular expression (sed) used to identify rows that contains
-    #              at least two results groups; the first is datetime and the
-    #              rest map told cols.
+    #              one result group - datetime.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
-    #   cols:      a list of one or more column names. The number of result
-    #              groups in rows_expr must be exactly one greater than
-    #              this number of columns (since the first grouping is always 
-    #              the date).
+    #   colname: a single column name used to store the tally value
 
-    (($#>5)) || { echo "ERROR: insufficient args to process_log_tally()"; exit 1; }
+    (($#==6)) || { echo "ERROR: insufficient args to process_log_tally()"; exit 1; }
     local logfile=$1
     local data_tmp=$2
     local csv_path=$3
     local rows_expr="$4"
     local filter_log_module=$5
-    shift 5
-    local cols=( $@ )
+    local colname=$6
     local catcmd=cat
     local current=
     local path=
@@ -46,19 +41,18 @@ process_log_tally ()
 
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
+    rows_expr="s,$rows_expr,\1,p"
     readarray -t rows<<<$(get_categories $catcmd $logfile "$rows_expr")
     (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || return 0
 
-    init_dataset $data_tmp "" ${cols[@]}
+    init_dataset $data_tmp "" $colname
     for entry in "${rows[@]}"; do
         declare -a info=( $entry )
         # round to nearest 10 minutes
         t=${info[0]::4}0
         path=${data_tmp}/${t//:/_}
-        for ((i=1; i<=${#cols[@]}; i+=1)); do
-            current=$(cat $path/${cols[$((i-1))]})
-            echo "$((current + 1))" > $path/${cols[$((i-1))]}
-        done
+        current=$(cat $path/$colname)
+        echo "$((current + 1))" > $path/$colname
     done
     create_csv $csv_path $data_tmp
 }

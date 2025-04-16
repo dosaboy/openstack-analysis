@@ -9,7 +9,8 @@
 
 SCRIPT_HEADER '\|reconnect\|'
 
-row_expr='s/^[0-9-]+T([0-9:]+)\.[0-9]+Z.+\|reconnect\|ERR\|\w+:((\S+):[0-9]+): no response to inactivity probe.+/\1 \2/p'
-process_log_tally $LOG $DATA_TMP $CSV_PATH "$row_expr" true ovsdb-inactivity-probe-timeouts
+y_label=ovsdb-inactivity-probe-timeouts
+row_expr='^[0-9-]+T([0-9:]+)\.[0-9]+Z.+\|reconnect\|ERR\|\w+:((\S+):[0-9]+): no response to inactivity probe.+'
+process_log_tally $LOG $DATA_TMP $CSV_PATH "$row_expr" true $y_label
 
-SCRIPT_FOOTER ovsdb-inactivity-probe-timeouts
+SCRIPT_FOOTER $y_label
