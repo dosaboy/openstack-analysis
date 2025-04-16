@@ -18,7 +18,7 @@ process_log_max ()
     #   rows_expr: regular expression (sed) used to identify row.
     #              This expression will typically be the same as cols_expr
     #              but with an $INSERT variable in place of the column
-    #              name.
+    #              name. Must match exactly two groups; datetime and colname.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
 
@@ -46,9 +46,11 @@ process_log_max ()
 
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
+    cols_expr="s,$cols_expr,\1,p"
     declare -a cols=( $(get_categories $catcmd $logfile "$cols_expr") )
     (( ${#cols[@]} )) && [[ -n ${cols[0]} ]] || return 0
 
+    rows_expr="s,$rows_expr,\1 \2,p"
     init_dataset $data_tmp "" ${cols[@]}
     flag=$(mktemp)
     echo "0" > $flag
