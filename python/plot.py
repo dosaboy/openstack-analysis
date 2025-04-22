@@ -143,7 +143,7 @@ class PLOT():
         print(f"Plotting data for {name} ({path})")
         csv = pd.read_csv(path)
         meta = self.get_meta(path)
-        use_bar = meta.get('type') == 'bar'
+        use_bar = meta.get('type') == 'bar_stacked'
 
         output = self.get_output_path(name)
         if os.path.exists(output) and not self.args.overwrite:

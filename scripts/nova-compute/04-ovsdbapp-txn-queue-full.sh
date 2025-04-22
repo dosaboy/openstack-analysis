@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=ovsdbapp.backend.ovs_idl.command
 Y_LABEL=ovsdbapp-txn-queue-full-events
+PLOT_TYPE=bar_stacked
 
 main ()
 {

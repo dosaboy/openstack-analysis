@@ -8,6 +8,7 @@ skip "$(basename $0) can take a very long time to run - enable manually if neede
 LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=neutron.wsgi
 Y_LABEL=http-return-codes
+PLOT_TYPE=bar_stacked
 
 main ()
 {

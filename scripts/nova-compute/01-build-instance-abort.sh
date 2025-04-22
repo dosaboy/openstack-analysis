@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
 Y_LABEL=aborted-instance-creates
+PLOT_TYPE=stackplot
 
 main ()
 {

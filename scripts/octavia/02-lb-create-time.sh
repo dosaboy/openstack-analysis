@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=octavia-worker.log
 LOG_MODULE=octavia.controller.worker.v1.tasks.database_tasks
 Y_LABEL=lb-create-time
+PLOT_TYPE=bar_stacked
 
 main ()
 {

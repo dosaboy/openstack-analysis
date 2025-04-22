@@ -37,6 +37,7 @@ These take very simple form. Here is an example script and explanation:
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=oslo_concurrency.lockutils
 Y_LABEL=max-lock-acquire-time
+PLOT_TYPE=bar_stacked
 
 main ()
 {
@@ -51,5 +52,6 @@ The above script sets the following required global variables:
 * LOG_MODULE: (required) a log module name to filter correct log lines
 * Y_LABEL: (required) the name given to the y-axis when the data is plotted as a graph
 * LOG_NAME_FILTER: (optional) filter to ensure we only search required files
+* PLOT_TYPE: (optional) Type of graph to plot. Supported types are ["bar_stacked"](https://matplotlib.org/stable/gallery/lines_bars_and_markers/bar_stacked.html) and ["stackplot"](https://matplotlib.org/stable/gallery/lines_bars_and_markers/stackplot_demo.html). Defaults to "bar_stacked".
 
 It also defines a main() function that is called when the job is run.

@@ -5,6 +5,7 @@
 
 LOG_MODULE="\[error\]"
 Y_LABEL=missed_heartbeats
+PLOT_TYPE=bar_stacked
 
 main ()
 {

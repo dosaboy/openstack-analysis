@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.virt.libvirt.driver
 Y_LABEL=network-vif-plugged-timeouts
+PLOT_TYPE=stackplot
 
 main ()
 {

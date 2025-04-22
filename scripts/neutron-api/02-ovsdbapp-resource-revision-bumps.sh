@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=neutron.db.ovn_revision_numbers_db
 Y_LABEL=resource-revision-bumps
+PLOT_TYPE=bar_stacked
 
 main ()
 {

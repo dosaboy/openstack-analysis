@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=ovsdbapp.backend.ovs_idl.vlog
 Y_LABEL=ovn-central-db-leader-changes
+PLOT_TYPE=bar_stacked
 
 main ()
 {

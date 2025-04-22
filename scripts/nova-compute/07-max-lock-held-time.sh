@@ -93,6 +93,7 @@ process_log ()
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=oslo_concurrency.lockutils
 Y_LABEL=max-lock-held-time
+PLOT_TYPE=bar_stacked
 
 main ()
 {

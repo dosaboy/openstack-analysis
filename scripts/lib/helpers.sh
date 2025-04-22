@@ -127,7 +127,7 @@ write_meta ()
     local dout=$1
     local x_label=$2
     local y_label=${3:-""}
-    local plot_type=${4:-bar}  # options: stacked | bar
+    local plot_type=${4:-bar_stacked}  # options: stackplot | bar_stacked
 
     outpath=${dout}/meta.yaml
     # if no ylabel and meta already exists, attempt to get existing and update.
@@ -199,6 +199,6 @@ SCRIPT_HEADER ()
 
 SCRIPT_FOOTER ()
 {
-    write_meta $RESULTS_DIR time $Y_LABEL ${PLOT_TYPE:-""}
+    write_meta $RESULTS_DIR ${X_LABEL:-"time"} $Y_LABEL ${PLOT_TYPE:-""}
     cleanup $DATA_TMP $CSV_PATH
 }

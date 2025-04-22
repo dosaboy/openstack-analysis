@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=ovsdb-server-sb.log
 LOG_MODULE='\|raft\|'
 Y_LABEL=ovn-ovsdb-sb-snapshot-leader-switches
+PLOT_TYPE=stackplot
 
 main ()
 {

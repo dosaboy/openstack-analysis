@@ -13,6 +13,7 @@ get_categories ()
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.service
 Y_LABEL=nova-compute-restarts
+PLOT_TYPE=bar_stacked
 
 main ()
 {

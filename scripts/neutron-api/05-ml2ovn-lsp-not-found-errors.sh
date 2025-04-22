@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=neutron.plugins.ml2.managers
 Y_LABEL=logical-switch-port-not-exists
+PLOT_TYPE=stackplot
 
 main ()
 {

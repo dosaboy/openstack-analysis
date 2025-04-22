@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=apache2
 LOG_MODULE=' - '
 Y_LABEL=http-return-codes
+PLOT_TYPE=bar_stacked
 
 main ()
 {

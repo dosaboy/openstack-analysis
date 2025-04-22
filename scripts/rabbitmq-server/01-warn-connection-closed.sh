@@ -5,6 +5,7 @@
 
 LOG_MODULE="\[warning\]"
 Y_LABEL=connections_closed
+PLOT_TYPE=bar_stacked
 
 main ()
 {

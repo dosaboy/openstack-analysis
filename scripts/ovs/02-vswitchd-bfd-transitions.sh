@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=ovs-vswitchd.log
 LOG_MODULE='\|bfd(\S+)?\|'
 Y_LABEL=ovs-bfd-state-change
+PLOT_TYPE=stackplot
 
 main ()
 {

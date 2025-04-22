@@ -13,6 +13,7 @@ get_categories ()
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=oslo.messaging._drivers.impl_rabbit
 Y_LABEL=missed-rabbitmq-heartbeats
+PLOT_TYPE=bar_stacked
 
 main ()
 {

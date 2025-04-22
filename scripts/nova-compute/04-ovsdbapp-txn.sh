@@ -13,6 +13,7 @@ get_categories ()
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=ovsdbapp.backend.ovs_idl.transaction
 Y_LABEL=ovsdbapp-transactions
+PLOT_TYPE=bar_stacked
 
 main ()
 {

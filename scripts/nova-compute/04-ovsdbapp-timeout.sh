@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
 Y_LABEL=ovsdbapp-timeouts
+PLOT_TYPE=bar_stacked
 
 main ()
 {

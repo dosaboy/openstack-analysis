@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.ovsdb_monitor
 Y_LABEL=router-bound-to-host
+PLOT_TYPE=bar_stacked
 
 main ()
 {

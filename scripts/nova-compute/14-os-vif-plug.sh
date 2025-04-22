@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=os_vif
 Y_LABEL=os-vif-plug-time
+PLOT_TYPE=bar_stacked
 
 main ()
 {

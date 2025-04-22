@@ -7,6 +7,7 @@
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.resource_tracker
 Y_LABEL=disk-gb
+PLOT_TYPE=stackplot
 
 main ()
 {
