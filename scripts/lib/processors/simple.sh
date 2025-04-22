@@ -45,6 +45,12 @@ process_log_simple ()
 
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
+    rows_expr="s,$rows_expr,"
+    # NOTE: columns groups start after datetime
+    for ((i=0; i<=${#cols[@]}; i+=1)); do
+        rows_expr+="\\$((i+1)) "
+    done
+    rows_expr="${rows_expr% },p"
     readarray -t rows<<<$(get_categories $catcmd $logfile "$rows_expr")
     (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || return 0
 
@@ -54,8 +60,8 @@ process_log_simple ()
         # round to nearest 10 minutes
         t=${info[0]::4}0
         path=${data_tmp}/${t//:/_}
-        for ((i=1; i<=${#cols[@]}; i+=1)); do
-            echo "${info[$i]}" > $path/${cols[$((i-1))]}
+        for ((i=0; i<${#cols[@]}; i+=1)); do
+            echo "${info[(($i+1))]}" > $path/${cols[$i]}
         done
     done
     create_csv $csv_path $data_tmp

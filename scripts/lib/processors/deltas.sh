@@ -47,13 +47,14 @@ process_log_deltas ()
     #   logfile: path to logfile
     #   data_tmp: path to temporary directory used to store data
     #   csv_path: path to output CSV file
-    #   cols_expr: regular expression (sed) used to identify columns.
-    #              Must identify one result group that matches the column
-    #              name.
-    #   rows_expr: regular expression (sed) used to identify row.
-    #              This expression will typically be the same as cols_expr
-    #              but with an $INSERT variable in place of the column
-    #              name.
+    #   seq_start_expr: regular expression (sed) used to identify the start of
+    #                   the delta sequence. Must identify three result groups;
+    #                   first is date, second is time and third is a unique id
+    #                   used to group results.
+    #   seq_end_expr: regular expression (sed) used used to identify the end of
+    #                 the delta sequence. Must identify three result groups;
+    #                 first is date, second is time and third is a unique id
+    #                 used to group results.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
 
@@ -61,8 +62,8 @@ process_log_deltas ()
     local logfile=$1
     local data_tmp=$2
     local csv_path=$3
-    local cols_expr="$4"
-    local rows_expr="$5"
+    local seq_start_expr="$4"
+    local seq_end_expr="$5"
     local filter_log_module=$6
     local catcmd=cat
     local max_jobs=10
@@ -85,19 +86,19 @@ process_log_deltas ()
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
     starts=$(mktemp -p $data_tmp)
-    get_categories $catcmd $logfile "s/$cols_expr/\0/p" > $starts
+    get_categories $catcmd $logfile "s/$seq_start_expr/\0/p" > $starts
     [[ -s $starts ]] || return 0
 
     ends=$(mktemp -p $data_tmp)
-    get_categories $catcmd $logfile "s/$rows_expr/\0/p" > $ends
+    get_categories $catcmd $logfile "s/$seq_end_expr/\0/p" > $ends
     [[ -s $ends ]] || return 0
 
     declare -n TIMINGS_DARRAY_STORE="range_starts"
-    get_timings "$cols_expr" $starts
+    get_timings "$seq_start_expr" $starts
     (( ${#range_starts[@]} )) || return 0
 
     declare -n TIMINGS_DARRAY_STORE="range_ends"
-    get_timings "$rows_expr" $ends
+    get_timings "$seq_end_expr" $ends
     (( ${#range_ends[@]} )) || return 0
 
     init_dataset_multi_date $y_label $data_tmp ${range_starts[@]}

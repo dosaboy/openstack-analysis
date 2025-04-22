@@ -47,7 +47,7 @@ process_log_max ()
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
     cols_expr="s,$cols_expr,\1,p"
-    declare -a cols=( $(get_categories $catcmd $logfile "$cols_expr") )
+    readarray -t cols<<<$(get_categories $catcmd $logfile "$cols_expr")
     (( ${#cols[@]} )) && [[ -n ${cols[0]} ]] || return 0
 
     rows_expr="s,$rows_expr,\1 \2,p"
@@ -56,6 +56,7 @@ process_log_max ()
     echo "0" > $flag
     for c in ${cols[@]}; do
         ((num_jobs+=1))
+        # Set INSERT var to column name
         INSERT=$c
         readarray -t rows<<<$($catcmd $logfile| sed -rn "$(eval echo \"$rows_expr\")")
         (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || continue

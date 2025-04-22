@@ -52,18 +52,18 @@ process_log_aggr2 ()
 
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
-    declare -a cols=( $(get_categories $catcmd $logfile "s,$cols_expr,\1,p") )
+    readarray -t cols<<<$(get_categories $catcmd $logfile "s,$cols_expr,\1,p")
     (( ${#cols[@]} )) && [[ -n ${cols[0]} ]] || return 0
 
     init_dataset $data_tmp "" ${cols[@]}
 
+    # Set the INSERT var to an OR'd list of all column names.
     INSERT="($(echo ${cols[@]}| tr ' ' '|'))"
     rows_expr="s,$rows_expr,"
 
-    # add one for the insert group
-    num_row_groups=$((num_row_groups + 1))
-    for ((i=1; i<num_row_groups+1; i+=1)); do
-        rows_expr+="\\$i "
+    # Add extra result group for INSERT
+    for ((i=0; i<num_row_groups+1; i+=1)); do
+        rows_expr+="\\$((i+1)) "
     done
     rows_expr="${rows_expr% },p"
 
