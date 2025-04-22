@@ -2,10 +2,6 @@
 #
 # Description: capture amount of time nova-compute locks are held for.
 #
-. $SCRIPT_ROOT/lib/helpers.sh
-
-# NOTE: only run this for nova-compute logs
-[[ $LOG =~ nova-compute.log ]] || exit 0
 
 is_uuid ()
 {
@@ -93,10 +89,14 @@ process_log ()
     rm $flag
 }
 
-SCRIPT_HEADER oslo_concurrency.lockutils
+# NOTE: only run this for nova-compute logs
+LOG_NAME_FILTER=nova-compute.log
+LOG_MODULE=oslo_concurrency.lockutils
+Y_LABEL=max-lock-held-time
 
-col_expr="s/$EXPR_LOG_DATE [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
-row_expr="s/$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\1/p"
-process_log $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH "$col_expr" "$row_expr"
-
-SCRIPT_FOOTER max-lock-held-time
+main ()
+{
+    col_expr="s/$EXPR_LOG_DATE [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
+    row_expr="s/$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\1/p"
+    process_log $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH "$col_expr" "$row_expr"
+}

@@ -39,8 +39,9 @@ process_log_event_deltas ()
 {
     # Description:
     #   Identify start and end times for an event using a search
-    #   expression for each then calculate the time delta and
-    #   save the maximum occurence per 10 minute window.
+    #   expression then using a third expression, counts the
+    #   number of times it matches between start and end and
+    #   save per 10 minute window.
     #
     #   The resulting csv data will have one y-axis column
     #   and a row for every ten minutes of time.
@@ -49,28 +50,29 @@ process_log_event_deltas ()
     #   logfile: path to logfile
     #   data_tmp: path to temporary directory used to store data
     #   csv_path: path to output CSV file
-    #   y_label: y-axis label
-    #   cols_expr: regular expression (sed) used to identify columns.
-    #              Must identify one result group that matches the column
-    #              name.
-    #   rows_expr: regular expression (sed) used to identify row.
-    #              This expression will typically be the same as cols_expr
-    #              but with an $INSERT variable in place of the column
-    #              name.
+    #   seq_start_expr: regular expression (sed) used to identify the start of
+    #                   the delta sequence. Must identify three result groups;
+    #                   first is date, second is time and third is a unique id
+    #                   used to group results.
+    #   seq_end_expr: regular expression (sed) used used to identify the end of
+    #                 the delta sequence. Must identify three result groups;
+    #                 first is date, second is time and third is a unique id
+    #                 used to group results.
     #   delta_events_expr: regular expression (egrep) used to events between
     #                      the start and end of a sequence.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
 
-    (($#==8)) || { echo "ERROR: insufficient args ($#) to process_log_event_deltas()"; exit 1; }
+    (($#==7)) || { echo "ERROR: insufficient args ($#) to process_log_event_deltas()"; exit 1; }
+    # Opts
     local logfile=$1
     local data_tmp=$2
     local csv_path=$3
-    local y_label=$4
-    local cols_expr="$5"
-    local rows_expr="$6"
-    local delta_events_expr="$7"
-    local filter_log_module=$8
+    local seq_start_expr="$4"
+    local seq_end_expr="$5"
+    local delta_events_expr="$6"
+    local filter_log_module=$7
+    # Vars
     local catcmd=cat
     local max_jobs=10
     local num_jobs=0
@@ -89,7 +91,7 @@ process_log_event_deltas ()
     ensure_csv_path $csv_path
 
     if $filter_log_module; then
-        echo "INFO: filtering log using '$LOG_MODULE' (script=$(get_script_name))"
+        echo "INFO: filtering log using '$LOG_MODULE' (script=$__SCRIPT_NAME__)"
         logfile=$(filter_log $logfile $LOG_MODULE)
     fi
 
@@ -97,24 +99,24 @@ process_log_event_deltas ()
 
     # get sequence end
     ends=$(mktemp -p $data_tmp)
-    get_categories $catcmd $logfile "s/$rows_expr/\0/p" > $ends
+    get_categories $catcmd $logfile "s/$seq_end_expr/\0/p" > $ends
     [[ -s $ends ]] || return 0
 
     # get sequence starts
     starts=$(mktemp -p $data_tmp)
-    get_categories $catcmd $logfile "s/$cols_expr/\0/p" > $starts
+    get_categories $catcmd $logfile "s/$seq_start_expr/\0/p" > $starts
     [[ -s $starts ]] || return 0
 
     # line numbers of sequence ends
     declare -n LN_DARRAY_STORE="range_ends"
     declare -n TIMINGS_DARRAY_STORE="range_end_times"
-    get_line_numbers "$rows_expr" $ends $logfile
+    get_line_numbers "$seq_end_expr" $ends $logfile
     (( ${#range_ends[@]} )) || return 0
 
     # line numbers of sequence starts
     declare -n LN_DARRAY_STORE="range_starts"
     declare -n TIMINGS_DARRAY_STORE="range_start_times"
-    get_line_numbers "$cols_expr" $starts $logfile
+    get_line_numbers "$seq_start_expr" $starts $logfile
     (( ${#range_starts[@]} )) || return 0
 
     for resource in ${!range_starts[@]}; do
@@ -124,16 +126,16 @@ process_log_event_deltas ()
         event_deltas[$resource]=$(get_num_matching_lines $start $end "$delta_events_expr" $logfile)
     done
 
-    init_dataset_multi_date $y_label $data_tmp ${range_start_times[@]}
+    init_dataset_multi_date $Y_LABEL $data_tmp ${range_start_times[@]}
 
     for vm in ${!event_deltas[@]}; do
         # round to nearest 10 minutes
         t=${range_end_times[$vm]::-4}0
         path=${data_tmp}/${t//:/_}
-        current=$(cat $path/$y_label)
+        current=$(cat $path/$Y_LABEL)
         delta=${event_deltas[$vm]}
         (($delta > $current)) || continue
-        echo $delta > $path/$y_label
+        echo $delta > $path/$Y_LABEL
     done
     create_csv $csv_path $data_tmp
 }

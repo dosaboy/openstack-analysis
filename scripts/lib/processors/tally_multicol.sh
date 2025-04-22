@@ -1,11 +1,12 @@
-process_log_aggr2 ()
+process_log_tally_multicol ()
 {
     # Description: 
     #   Identify one more resources/columns then for every 10 minute window,
-    #   tally the occurence of each resource OR optionally save theie value.
-    #   The default tally behaviour is used if the search results contain a
-    #   single group (time) and if there is a second group that is used as the
-    #   value to save.
+    #   tally the occurence of each resource OR optionally save their value.
+    #
+    #   The default tally behaviour is used if the search results contain only
+    #   time and resource/column name and if there is a third group that is
+    #   used as the value to save.
     #
     #   The resulting csv data will have one y-axis column per
     #   resource and a row for every ten minutes of time.
@@ -26,7 +27,8 @@ process_log_aggr2 ()
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
 
-    (($#==7)) || { echo "ERROR: insufficient args ($#) to process_log_aggr2()"; exit 1; }
+    (($#==7)) || { echo "ERROR: insufficient args ($#) to process_log_tally_multicol()"; exit 1; }
+    # Opts
     local logfile=$1
     local data_tmp=$2
     local csv_path=$3
@@ -34,6 +36,7 @@ process_log_aggr2 ()
     local rows_expr="$5"
     local num_row_groups=$6
     local filter_log_module=$7
+    # Vars
     local catcmd=cat
     local rownum=0
     local _time=
@@ -46,7 +49,7 @@ process_log_aggr2 ()
     ensure_csv_path $csv_path
 
     if $filter_log_module; then
-        echo "INFO: filtering log using '$LOG_MODULE' (script=$(get_script_name))"
+        echo "INFO: filtering log using '$LOG_MODULE' (script=$__SCRIPT_NAME__)"
         logfile=$(filter_log $logfile $LOG_MODULE)
     fi
 

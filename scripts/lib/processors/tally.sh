@@ -1,10 +1,8 @@
 process_log_tally ()
 {
     # Description: 
-    #   Identify rows that match an event where the result can
-    #   contain one or more columns as provided. A tally is then
-    #   created for the number of times that event occurs per 10
-    #   minute window.
+    #   Identify a single column then for every 10 minute window,
+    #   tally its occurences.
     #
     #   The resulting csv data will have one y-axis column per
     #   provided column name and a row for every ten minutes of time.
@@ -18,14 +16,18 @@ process_log_tally ()
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
     #   colname: a single column name used to store the tally value
+    #   filter_log_module: Apply the default filter of LOG_MODULE to the
+    #                      logfile prior to searching.
 
     (($#==6)) || { echo "ERROR: insufficient args to process_log_tally()"; exit 1; }
+    # Opts
     local logfile=$1
     local data_tmp=$2
     local csv_path=$3
     local rows_expr="$4"
     local filter_log_module=$5
     local colname=$6
+    # Vars
     local catcmd=cat
     local current=
     local path=
@@ -35,7 +37,7 @@ process_log_tally ()
     ensure_csv_path $csv_path
 
     if $filter_log_module; then
-        echo "INFO: filtering log using '$LOG_MODULE' (script=$(get_script_name))"
+        echo "INFO: filtering log using '$LOG_MODULE' (script=$__SCRIPT_NAME__)"
         logfile=$(filter_log $logfile $LOG_MODULE)
     fi
 

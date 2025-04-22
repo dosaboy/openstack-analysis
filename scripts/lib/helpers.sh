@@ -146,21 +146,13 @@ write_meta ()
     echo -e "type: $plot_type" >> $outpath
 }
 
-get_script_name ()
-{
-    basename $0| sed -r 's/[0-9]+-(.+)\.sh/\1/'| tr '-' '_'
-}
-
 get_results_dir ()
 {
     local mod_name=
     local script_name=
     local path=
 
-    mod_name=$(basename $(dirname $0))
-    script_name=$(get_script_name)
-    path=$OUTPUT_PATH/data/$mod_name/$script_name
-
+    path=$OUTPUT_PATH/data/$__SCRIPT_MODULE_NAME__/$__SCRIPT_NAME__
     flock $LOCKFILE mkdir -p $path
     echo $path
 }
@@ -197,7 +189,7 @@ done
 
 SCRIPT_HEADER ()
 {
-    export LOG_MODULE=$1
+    [[ -z $LOG_NAME_FILTER ]] || [[ $LOG =~ $LOG_NAME_FILTER ]] || exit 0
     . $SCRIPT_ROOT/lib/log_expressions.sh
     export RESULTS_DIR=$(get_results_dir)
     export DATA_TMP=`mktemp -d -p $RESULTS_DIR --suffix=-datatmp`
@@ -207,8 +199,6 @@ SCRIPT_HEADER ()
 
 SCRIPT_FOOTER ()
 {
-    export Y_LABEL=$1
-    local plot_type=${2:-""}
-    write_meta $RESULTS_DIR time $Y_LABEL $plot_type
+    write_meta $RESULTS_DIR time $Y_LABEL ${PLOT_TYPE:-""}
     cleanup $DATA_TMP $CSV_PATH
 }

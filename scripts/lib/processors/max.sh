@@ -23,12 +23,14 @@ process_log_max ()
     #                      logfile prior to searching.
 
     (($#==6)) || { echo "ERROR: insufficient args ($#) to process_log_max()"; exit 1; }
+    # Opts
     local logfile=$1
     local data_tmp=$2
     local csv_path=$3
     local cols_expr="$4"
     local rows_expr="$5"
     local filter_log_module=$6
+    # Vars
     local catcmd=cat
     local max_jobs=10
     local num_jobs=0
@@ -40,7 +42,7 @@ process_log_max ()
     ensure_csv_path $csv_path
 
     if $filter_log_module; then
-        echo "INFO: filtering log using '$LOG_MODULE' (script=$(get_script_name))"
+        echo "INFO: filtering log using '$LOG_MODULE' (script=$__SCRIPT_NAME__)"
         logfile=$(filter_log $logfile $LOG_MODULE)
     fi
 

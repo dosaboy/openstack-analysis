@@ -2,15 +2,15 @@
 #
 # Description: capture number of instance delete requests
 #
-. $SCRIPT_ROOT/lib/helpers.sh
 
 # NOTE: only run this for nova-compute logs
-[[ $LOG =~ nova-compute.log ]] || exit 0
+LOG_NAME_FILTER=nova-compute.log
+LOG_MODULE=nova.compute.manager
+Y_LABEL=num-instance-deletes
 
-SCRIPT_HEADER nova.compute.manager
-
-col_expr="$EXPR_LOG_DATE $EXPR_LOG_CONTEXT_GROUP_USER .+ Terminating instance"
-row_expr="$EXPR_LOG_DATE_GROUP_TIME $EXPR_LOG_CONTEXT_INSERT_USER .+ Terminating instance"
-process_log_aggr2 $LOG $DATA_TMP $CSV_PATH "$col_expr" "$row_expr" 1 true
-
-SCRIPT_FOOTER num-instance-deletes
+main ()
+{
+    col_expr="$EXPR_LOG_DATE $EXPR_LOG_CONTEXT_GROUP_USER .+ Terminating instance"
+    row_expr="$EXPR_LOG_DATE_GROUP_TIME $EXPR_LOG_CONTEXT_INSERT_USER .+ Terminating instance"
+    process_log_tally_multicol $LOG $DATA_TMP $CSV_PATH "$col_expr" "$row_expr" 1 true
+}

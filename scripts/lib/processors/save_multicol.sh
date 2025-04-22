@@ -1,4 +1,4 @@
-process_log_simple ()
+process_log_save_multicol ()
 {
     # Description: 
     #   Identify rows that match an event where the result can
@@ -23,7 +23,8 @@ process_log_simple ()
     #              this number of columns (since the first grouping is always 
     #              the date).
 
-    (($#>5)) || { echo "ERROR: insufficient args to process_log_simple()"; exit 1; }
+    (($#>5)) || { echo "ERROR: insufficient args to process_log_save_multicol()"; exit 1; }
+    # Opts
     local logfile=$1
     local data_tmp=$2
     local csv_path=$3
@@ -31,6 +32,7 @@ process_log_simple ()
     local filter_log_module=$5
     shift 5
     local cols=( $@ )
+    # Vars
     local catcmd=cat
     local path=
 
@@ -39,7 +41,7 @@ process_log_simple ()
     ensure_csv_path $csv_path
 
     if $filter_log_module; then
-        echo "INFO: filtering log using '$LOG_MODULE' (script=$(get_script_name))"
+        echo "INFO: filtering log using '$LOG_MODULE' (script=$__SCRIPT_NAME__)"
         logfile=$(filter_log $logfile $LOG_MODULE)
     fi
 
