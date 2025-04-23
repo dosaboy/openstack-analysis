@@ -32,12 +32,11 @@ process_log_tally ()
     local current=
     local path=
 
-    #echo "Searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
-
-    ensure_csv_path $csv_path
+    log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
+    ensure_csv_path $csv_path || return
 
     if $filter_log_module; then
-        echo "INFO: filtering log using '$LOG_MODULE' (script=$__SCRIPT_NAME__)"
+        log_debug "filtering log using '$LOG_MODULE' (script=$__SCRIPT_NAME__)"
         logfile=$(filter_log $logfile $LOG_MODULE)
     fi
 

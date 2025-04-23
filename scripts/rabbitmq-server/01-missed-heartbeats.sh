@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture closed connection error events - indicates missed heartbeats
-#
 
 LOG_MODULE="\[error\]"
 Y_LABEL=missed_heartbeats

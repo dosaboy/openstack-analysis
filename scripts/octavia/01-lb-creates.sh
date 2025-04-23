@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: loadbalancer creates
-#
 
 # NOTE: only run this for octavia-worker logs
 LOG_NAME_FILTER=octavia-worker.log

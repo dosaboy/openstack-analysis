@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture number of instance delete requests
-#
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log

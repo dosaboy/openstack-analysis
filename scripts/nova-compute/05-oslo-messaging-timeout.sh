@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture rpc messaging timeouts
-#
 
 # override - no project ids to check
 get_categories ()

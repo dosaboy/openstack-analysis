@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture ovsdb inactivity probe timeouts
-#
 
 # NOTE: only run this for ovsdb-server logs
 LOG_NAME_FILTER=ovsdb-server

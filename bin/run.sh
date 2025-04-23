@@ -51,10 +51,13 @@ done
 
 [[ -d $JOBS_DEFS_DIR ]] || { echo "ERROR: jobs path not found"; exit 1; }
 PIDS=()
-for job in $(find $JOBS_DEFS_DIR -name run.sh); do
-    $job &
-    PIDS+=( $! )
-    (( ${#PIDS[@]} % MAX_CONCURRENT_JOBS == 0 )) && { echo waiting; wait; }
+for hostjobs in $(ls -d $JOBS_DEFS_DIR/*); do
+    echo "## running $(basename $hostjobs) jobs"
+    for job in $(find $hostjobs -type f); do
+        $job &
+        PIDS+=( $! )
+        (( ${#PIDS[@]} % MAX_CONCURRENT_JOBS == 0 )) && { echo "INFO: waiting for $MAX_CONCURRENT_JOBS job(s) to complete before continuing"; wait; }
+    done
 done
 wait
 rm -rf $JOBS_DEFS_DIR

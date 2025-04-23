@@ -1,5 +1,11 @@
 #!/bin/bash -u
 
+log_debug ()
+{
+    $DEBUG_MODE || return
+    echo "DEBUG: $@"
+}
+
 _init_time ()
 {
     local root=$1
@@ -65,14 +71,40 @@ cleanup ()
 {
     local tmpdir=$1
     local csv_file=$2
+    local ctrl_open='\033['
+    local ctrl_color='0;32m' # green
+    local ctrl_close='\033[0m'
+    local suffix=""
 
-    [[ -n $tmpdir ]] || { echo "ERROR: datatmp path ($tmpdir) not set!"; exit 1; }
+    if [[ -z $tmpdir ]]; then
+        ctrl_color='0;31m' # red
+        echo -e "${ctrl_open}${ctrl_color}$()[FAIL]${ctrl_close} $HOSTNAME.$__SCRIPT_NAME__ - datatmp path ($tmpdir) not set!"
+        exit 1
+    fi
+    if ! [[ -d $tmpdir ]]; then
+        ctrl_color='0;31m' # red
+        echo -e "${ctrl_open}${ctrl_color}$()[FAIL]${ctrl_close} $HOSTNAME.$__SCRIPT_NAME__ - datatmp path ($tmpdir) is not a directory"
+        exit 1
+    fi
 
     rm -rf $tmpdir
-    [[ -f $csv_file ]] && ls -al $csv_file
-    if [[ -f $csv_file ]] && $(egrep -q "datetime,$" $csv_file); then
-        rm $csv_file
+    if [[ -f $csv_file ]]; then
+        # delete if no real data in csv file
+        if $(egrep -q "datetime,$" $csv_file); then
+            rm $csv_file
+            ctrl_color='0;33m' # amber
+            suffix=" - no data found"
+        elif [[ -n $CSV_MODIFIED_TIME ]]; then
+            if [[ $CSV_MODIFIED_TIME = $(stat --printf=%y $CSV_PATH) ]]; then
+                ctrl_color='1;36m' # blue
+                suffix=" - no change, use --overwrite to refresh"
+            fi
+        fi
+    else
+        ctrl_color='0;33m' # amber       
+        suffix=" - no data found"
     fi
+    echo -e "${ctrl_open}${ctrl_color}$()[DONE]${ctrl_close} $HOSTNAME.$__SCRIPT_NAME__${suffix}"
 }
 
 create_csv ()
@@ -112,14 +144,12 @@ ensure_csv_path ()
 
     if [[ -e $path ]]; then
         if ! $OVERWRITE_CSV; then
-            echo "$path already exists and overwrite=false - skipping"
-            write_meta $RESULTS_DIR time
-            cleanup $DATA_TMP $CSV_PATH
-            exit 0
+            log_debug "$path already exists and overwrite=false - skipping"
+            return 1
         fi
-
         rm -f $path
     fi
+    return 0
 }
 
 write_meta ()
@@ -148,8 +178,6 @@ write_meta ()
 
 get_results_dir ()
 {
-    local mod_name=
-    local script_name=
     local path=
 
     path=$OUTPUT_PATH/data/$__SCRIPT_MODULE_NAME__/$__SCRIPT_NAME__
@@ -178,7 +206,7 @@ filter_log ()
 skip ()
 {
     local reason=${1:-"unknown"}
-    echo "INFO: skipping script - reason='$reason'"
+    echo "INFO: skipping $__SCRIPT_NAME__ - reason='$reason'"
     exit 0
 }
 
@@ -194,6 +222,11 @@ SCRIPT_HEADER ()
     export RESULTS_DIR=$(get_results_dir)
     export DATA_TMP=`mktemp -d -p $RESULTS_DIR --suffix=-datatmp`
     export CSV_PATH=$RESULTS_DIR/${HOSTNAME}_$(basename $RESULTS_DIR).csv
+    if [[ -f $CSV_PATH ]]; then
+        export CSV_MODIFIED_TIME=$(stat --printf=%y $CSV_PATH)
+    else
+        export CSV_MODIFIED_TIME=
+    fi
 }
 
 

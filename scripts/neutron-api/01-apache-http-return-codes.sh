@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: plot apache http return codes.
-#
 
 # NOTE: only run this for apache logs
 LOG_NAME_FILTER=apache2

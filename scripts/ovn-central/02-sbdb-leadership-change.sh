@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: ovn sb db leader switch for snapshot
-#
 
 # NOTE: only run this for sb logs
 LOG_NAME_FILTER=ovsdb-server-sb.log

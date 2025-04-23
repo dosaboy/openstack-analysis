@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture time taken to allocate network resources for new vm.
-#
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log

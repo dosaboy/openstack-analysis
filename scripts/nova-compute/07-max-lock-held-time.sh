@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture amount of time nova-compute locks are held for.
-#
 
 is_uuid ()
 {
@@ -28,7 +25,9 @@ process_log ()
     local MAX_JOBS=10
     local NUM_JOBS=0
 
-    ensure_csv_path $CSV_PATH
+    log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
+    ensure_csv_path $CSV_PATH || return
+
     file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
 
     readarray -t CATEGORY<<<$($CATCMD $LOG| sed -rn "$CATEGORY_EXPR1"| sort -u)

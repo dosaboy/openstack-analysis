@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: plot instances of LSP not found
-#
 
 # NOTE: only run this for neutron-server logs
 LOG_NAME_FILTER=neutron-server.log

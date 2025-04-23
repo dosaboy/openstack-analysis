@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture ovn ovsdbapp aborted transactions
-#
 
 # NOTE: only run this for neutron-server logs
 LOG_NAME_FILTER=neutron-server.log

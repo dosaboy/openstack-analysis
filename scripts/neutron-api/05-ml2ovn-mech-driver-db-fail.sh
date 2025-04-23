@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: plot OVN mechanism driver db failures
-#
 
 # NOTE: only run this for neutron-server logs
 LOG_NAME_FILTER=neutron-server.log

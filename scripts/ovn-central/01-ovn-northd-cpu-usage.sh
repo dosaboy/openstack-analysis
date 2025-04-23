@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture ovn northd high CPU usage
-#
 
 # NOTE: only run this for ovn-northd logs
 LOG_NAME_FILTER=ovn-northd.log

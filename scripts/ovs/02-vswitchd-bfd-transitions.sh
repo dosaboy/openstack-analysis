@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: ovs bfd state changs
-#
 
 # NOTE: only run this for ovs-vswitchd logs
 LOG_NAME_FILTER=ovs-vswitchd.log

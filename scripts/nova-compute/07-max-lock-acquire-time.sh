@@ -1,5 +1,3 @@
-#!/bin/bash -eu
-#
 # Description: capture amount of time nova-compute takes to acquire a lock
 #              This looks specifically at locks taken by the non-default
 #              context i.e. as part of user requests.

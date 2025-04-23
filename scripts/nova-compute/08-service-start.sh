@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture number of times nova-compute service is restarted.
-#
 
 # override - no project ids to check
 get_categories ()

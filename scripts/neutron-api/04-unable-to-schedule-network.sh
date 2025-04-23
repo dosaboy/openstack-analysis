@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: plot unable to schedule network warnings
-#
 
 # NOTE: only run this for neutron-server logs
 LOG_NAME_FILTER=neutron-server.log

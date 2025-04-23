@@ -1,9 +1,6 @@
-#!/bin/bash -eu
-#
 # Description: Capture amount of time nova-compute takes to acquire a lock.
 #              This looks specifically at locks taken by the compute service
 #              itself i.e the "default" context.
-#
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log

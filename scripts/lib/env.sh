@@ -1,6 +1,7 @@
 #!/bin/bash -u
 
 # GLOBALS
+export DEBUG_MODE=false
 export OVERWRITE_CSV=false
 export HOST_OVERRIDE=()
 export SOS_ROOT=
@@ -21,6 +22,8 @@ SYNOPSIS
     Capture data from log files and save in CSV format. This can then be
     plotted.
 
+    --debug
+        Enable debug logs.
     --overwrite
         Overwrite existing CSV files. Defaults to false.
     --host
@@ -46,6 +49,9 @@ EOF
 
 while (($# > 0)); do
     case "$1" in
+        --debug)
+            DEBUG_MODE=true
+            ;;
         --overwrite)
             OVERWRITE_CSV=true
             ;;

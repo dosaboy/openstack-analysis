@@ -1,8 +1,6 @@
-#!/bin/bash -eu
-#
 # Description: capture api http return codes
-#
-skip "$(basename $0) can take a very long time to run - enable manually if needed"
+
+skip "can take a very long time to run - enable manually if needed"
 
 # NOTE: only run this for neutron-server logs
 LOG_NAME_FILTER=neutron-server.log

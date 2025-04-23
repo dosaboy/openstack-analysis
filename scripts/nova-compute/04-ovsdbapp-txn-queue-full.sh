@@ -1,7 +1,4 @@
-#!/bin/bash -eu
-#
 # Description: capture number of ovsdbapp transcation queue full errors.
-#
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log

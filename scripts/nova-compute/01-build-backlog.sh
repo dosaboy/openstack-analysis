@@ -1,12 +1,9 @@
-#!/bin/bash -eu
-#
 # Description:
 #   Nova will process multiple build requests concurrently. We can get an idea
 #   of how busy the service is by looking at how many other requests are
 #   processed between the start and end of a single vm request. We call these
 #   interrupts the "backlog" and this script extracts the maximum backlog size
 #   in every 10 minutes of time.
-#
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
