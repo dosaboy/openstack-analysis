@@ -5,7 +5,7 @@ SCRIPT_ROOT=$BIN_ROOT/../scripts
 GRAPHS_PATH=$OUTPUT_PATH/graphs
 
 if ! [[ -d $GRAPHS_PATH ]]; then
-    echo "INFO: no graphs found to show ($GRAPHS_PATH)"
+    echo "INFO: path '$GRAPHS_PATH' not found. Use --output to provide another"
     exit 1
 fi
 
