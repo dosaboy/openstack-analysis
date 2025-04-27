@@ -9,6 +9,6 @@ PLOT_TYPE=bar_stacked
 main ()
 {
     col_expr="$EXPR_LOG_DATE [0-9]+ \w+ $LOG_MODULE ovsdbapp.backend.ovs_idl.idlutils.RowNotFound: Cannot find (\w+) with name=.+"
-    row_expr="$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $LOG_MODULE ovsdbapp.backend.ovs_idl.idlutils.RowNotFound: Cannot find \$INSERT with name=.+"
-    process_log_tally_multicol $LOG $DATA_TMP $CSV_PATH "$col_expr" "$row_expr" 1 true
+    row_expr="$EXPR_LOG_DATE_GROUP_DATE_AND_TIME [0-9]+ \w+ $LOG_MODULE ovsdbapp.backend.ovs_idl.idlutils.RowNotFound: Cannot find \$INSERT with name=.+"
+    process_log_tally_multicol $LOG $DATA_TMP $CSV_PATH "$col_expr" "$row_expr" 0 true
 }

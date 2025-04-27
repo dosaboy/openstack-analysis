@@ -14,6 +14,6 @@ PLOT_TYPE=bar_stacked
 
 main ()
 {
-    row_expr="$EXPR_LOG_DATE_GROUP_TIME $EXPR_LOG_DEFAULT_INSERT_CONTEXT .+ oslo_messaging.exceptions.MessagingTimeout: .+"
-    process_log_tally_multicol $LOG $DATA_TMP $CSV_PATH "" "$row_expr" 1 true
+    row_expr="$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_DEFAULT_INSERT_CONTEXT .+ oslo_messaging.exceptions.MessagingTimeout: .+"
+    process_log_tally_multicol $LOG $DATA_TMP $CSV_PATH "" "$row_expr" 0 true
 }

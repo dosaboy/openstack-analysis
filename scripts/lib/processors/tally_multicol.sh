@@ -22,8 +22,8 @@ process_log_tally_multicol ()
     #              This expression will typically be the same as cols_expr
     #              but with an $INSERT variable in place of the column
     #              name. Must match at least two groups.
-    #   num_row_groups: number of groups in row results. this must match the
-    #                   expression provided.
+    #   num_row_groups: number of extra groups in row results. this must match
+    #                   the expression provided. Excludes date and time.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
 
@@ -42,9 +42,8 @@ process_log_tally_multicol ()
     local _time=
     local current=
     local path=
+    local datetime=
     declare -A cache=()
-
-    #echo "Searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
 
     log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
     ensure_csv_path $csv_path || return
@@ -59,15 +58,13 @@ process_log_tally_multicol ()
     readarray -t cols<<<$(get_categories $catcmd $logfile "s,$cols_expr,\1,p")
     (( ${#cols[@]} )) && [[ -n ${cols[0]} ]] || return 0
 
-    init_dataset $data_tmp "" ${cols[@]}
-
     # Set the INSERT var to an OR'd list of all column names.
     INSERT="($(echo ${cols[@]}| tr ' ' '|'))"
-    rows_expr="s,$rows_expr,"
+    rows_expr="s,$rows_expr,\1T\2 \3 "
 
     # Add extra result group for INSERT
-    for ((i=0; i<num_row_groups+1; i+=1)); do
-        rows_expr+="\\$((i+1)) "
+    for ((i=0; i<num_row_groups; i+=1)); do
+        rows_expr+="\\$((i+4)) "
     done
     rows_expr="${rows_expr% },p"
 
@@ -82,10 +79,10 @@ process_log_tally_multicol ()
         #  [1]: column name (mandatory)
         #  [2]: value (optional)
         # round time to nearest 10 minutes
-        t=${split[0]::4}0
+        datetime=${split[0]::-4}0
         col=${split[1]}
         ## CACHE
-        if [[ $_time = $t ]]; then
+        if [[ $_time = $datetime ]]; then
             # If a value group exists save the max.
             if ((${#split[@]} > 2)); then
                 if [[ ${cache[$col]:-null} = null ]] || \
@@ -98,13 +95,14 @@ process_log_tally_multicol ()
             (($rownum<${#rows[@]})) && continue
         elif [[ -z $_time ]] && (($rownum==${#rows[@]})); then
             # support only one matching row
-            _time=$t
+            _time=$datetime
             cache=( [$col]=1 )
         fi
         ## FLUSH
         if [[ -n $_time ]]; then
             path=${data_tmp}/${_time//:/_}
             for _col in ${!cache[@]}; do
+                [[ -r $path/$_col ]] || init_dataset $data_tmp ${datetime%T*} $_col
                 if ((${#split[@]} > 2)); then
                     echo ${cache[$_col]} > $path/$_col
                 else
@@ -114,7 +112,7 @@ process_log_tally_multicol ()
             done
         fi
         ## SET
-        _time=$t
+        _time=$datetime
         cache=( [$col]=1 )
     done
     (($rownum)) && create_csv $csv_path $data_tmp

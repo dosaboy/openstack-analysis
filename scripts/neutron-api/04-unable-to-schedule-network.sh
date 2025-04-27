@@ -8,6 +8,6 @@ PLOT_TYPE=stackplot
 
 main ()
 {
-    row_expr="$EXPR_LOG_DATE_GROUP_TIME $EXPR_LOG_CONTEXT Unable to schedule network [a-z0-9-]+: no agents available.+"
+    row_expr="$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT Unable to schedule network [a-z0-9-]+: no agents available.+"
     process_log_tally $LOG $DATA_TMP $CSV_PATH "$row_expr" true $Y_LABEL
 }

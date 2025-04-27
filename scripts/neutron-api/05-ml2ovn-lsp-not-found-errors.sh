@@ -8,6 +8,6 @@ PLOT_TYPE=stackplot
 
 main ()
 {
-    row_expr="$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $LOG_MODULE RuntimeError: Logical Switch Port [0-9a-z-]+ does not exist"
+    row_expr="$EXPR_LOG_DATE_GROUP_DATE_AND_TIME [0-9]+ \w+ $LOG_MODULE RuntimeError: Logical Switch Port [0-9a-z-]+ does not exist"
     process_log_tally $LOG $DATA_TMP $CSV_PATH "$row_expr" true $Y_LABEL
 }

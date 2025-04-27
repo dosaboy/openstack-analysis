@@ -14,8 +14,8 @@ process_log_save_multicol ()
     #   data_tmp: path to temporary directory used to store data
     #   csv_path: path to output CSV file
     #   rows_expr: regular expression (sed) used to identify rows that contains
-    #              at least two results groups; the first is datetime and the
-    #              rest map told cols.
+    #              at least three results groups; the first is date, second is
+    #              time and the rest map told cols.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
     #   cols:      a list of one or more column names. The number of result
@@ -35,6 +35,7 @@ process_log_save_multicol ()
     # Vars
     local catcmd=cat
     local path=
+    local datetime=
 
     log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
     ensure_csv_path $csv_path || return
@@ -46,22 +47,22 @@ process_log_save_multicol ()
 
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
-    rows_expr="s,$rows_expr,"
-    # NOTE: columns groups start after datetime
-    for ((i=0; i<=${#cols[@]}; i+=1)); do
-        rows_expr+="\\$((i+1)) "
+    rows_expr="s,$rows_expr,\1T\2 "
+    # NOTE: column groups start after datetime
+    for ((i=0; i<${#cols[@]}; i+=1)); do
+        rows_expr+="\\$((i+3)) "
     done
     rows_expr="${rows_expr% },p"
     readarray -t rows<<<$(get_categories $catcmd $logfile "$rows_expr")
     (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || return 0
 
-    init_dataset $data_tmp "" ${cols[@]}
     for entry in "${rows[@]}"; do
         declare -a info=( $entry )
         # round to nearest 10 minutes
-        t=${info[0]::4}0
-        path=${data_tmp}/${t//:/_}
+        datetime=${info[0]::-4}0
+        path=${data_tmp}/${datetime//:/_}
         for ((i=0; i<${#cols[@]}; i+=1)); do
+            [[ -r $path/${cols[$i]} ]] || init_dataset $data_tmp ${datetime%T*} ${cols[$i]}
             echo "${info[(($i+1))]}" > $path/${cols[$i]}
         done
     done

@@ -12,7 +12,7 @@ process_log_tally ()
     #   data_tmp: path to temporary directory used to store data
     #   csv_path: path to output CSV file
     #   rows_expr: regular expression (sed) used to identify rows that contains
-    #              one result group - datetime.
+    #              two result groups - date and time.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
     #   colname: a single column name used to store the tally value
@@ -31,6 +31,7 @@ process_log_tally ()
     local catcmd=cat
     local current=
     local path=
+    local datetime=
 
     log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
     ensure_csv_path $csv_path || return
@@ -42,16 +43,16 @@ process_log_tally ()
 
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
-    rows_expr="s,$rows_expr,\1,p"
+    rows_expr="s,$rows_expr,\1T\2,p"
     readarray -t rows<<<$(get_categories $catcmd $logfile "$rows_expr")
     (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || return 0
 
-    init_dataset $data_tmp "" $colname
     for entry in "${rows[@]}"; do
         declare -a info=( $entry )
         # round to nearest 10 minutes
-        t=${info[0]::4}0
-        path=${data_tmp}/${t//:/_}
+        datetime=${info[0]::-4}0
+        path=${data_tmp}/${datetime//:/_}
+        [[ -r $path/$colname ]] || init_dataset $data_tmp ${datetime%T*} $colname
         current=$(cat $path/$colname)
         echo "$((current + 1))" > $path/$colname
     done

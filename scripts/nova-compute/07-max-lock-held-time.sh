@@ -16,31 +16,36 @@ process_log ()
 {
     # OVERRIDE DEFAULT PROCESSOR
 
-    local LOG=$1
-    local DATA_TMP=$2
-    local CSV_PATH=$3
-    local CATEGORY_EXPR1="$4"
-    local CATEGORY_EXPR2="$5"
-    local CATCMD
-    local MAX_JOBS=10
-    local NUM_JOBS=0
+    # Opts
+    local logfile=$1
+    local data_tmp=$2
+    local csv_path=$3
+    local cols_expr="$4"
+    local rows_expr="$5"
+    # Vars
+    local catcmd=cat
+    local max_jobs=10
+    local num_jobs=0
+    local current=
+    local path=
+    local datetime=
 
     log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
-    ensure_csv_path $CSV_PATH || return
+    ensure_csv_path $csv_path || return
 
-    file --mime-type $LOG| grep -q application/gzip && CATCMD=zcat || CATCMD=cat
+    file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
-    readarray -t CATEGORY<<<$($CATCMD $LOG| sed -rn "$CATEGORY_EXPR1"| sort -u)
-    (( ${#CATEGORY[@]} )) && [[ -n ${CATEGORY[0]} ]] || return 0
+    cols_expr="s,$cols_expr,\1 \2,p"
+    readarray -t cols<<<$(get_categories $catcmd $logfile "$cols_expr")
+    (( ${#cols[@]} )) && [[ -n ${cols[0]} ]] || return 0
 
     TIME_LIMIT_MIN=30
-
     RESOURCE_TAG=NOVA_RESOURCES
 
     declare -A deduped=()
     # Aggregate all resource locks into a single entry so that the others are easier to distinguish
     declare -A _filtered[$RESOURCE_TAG]=0
-    for c in "${CATEGORY[@]}"; do
+    for c in "${cols[@]}"; do
         declare -a _c=( $c )
         name=${_c[0]}
         deduped[$name]=0
@@ -51,12 +56,10 @@ process_log ()
         fi
     done
 
-    init_dataset $DATA_TMP "" ${!_filtered[@]}
-
-    local current=0
+    rows_expr="s,$rows_expr,\1T\2,p"
     flag=$(mktemp)
     echo "0" > $flag
-    for c in "${CATEGORY[@]}"; do
+    for c in "${cols[@]}"; do
         declare -a _c=( $c )
         name=${_c[0]}
         time=${_c[1]}
@@ -65,26 +68,27 @@ process_log ()
         ((${deduped[$name]}==0)) || continue
         deduped[$name]=1
 
-        ((NUM_JOBS+=1))
-        for t in $($CATCMD $LOG| sed -rn "$(eval echo \"$CATEGORY_EXPR2\")"); do
+        ((num_jobs+=1))
+        for t in $($catcmd $logfile| sed -rn "$(eval echo \"$rows_expr\")"); do
             # round to nearest 10 minutes
-            t=${t[0]::4}0
-            local path=${DATA_TMP}/${t//:/_}
+            datetime=${t[0]::-4}0
+            path=${data_tmp}/${datetime//:/_}
             if is_uuid $name; then
                 name=$RESOURCE_TAG
             fi
+            [[ -r $path/$name ]] || init_dataset $data_tmp ${datetime%T*} $name
             current=$(cat $path/$name)
             ((time > current)) || continue
             echo $time > $path/$name
             echo "1" > $flag
         done &
-        if ((NUM_JOBS==MAX_JOBS)); then
+        if ((num_jobs==max_jobs)); then
             wait
-            NUM_JOBS=0
+            num_jobs=0
         fi
     done
     wait
-    (($(cat $flag)==1)) && create_csv $CSV_PATH $DATA_TMP
+    (($(cat $flag)==1)) && create_csv $csv_path $data_tmp
     rm $flag
 }
 
@@ -96,7 +100,7 @@ PLOT_TYPE=bar_stacked
 
 main ()
 {
-    col_expr="s/$EXPR_LOG_DATE [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+/\1 \2/p"
-    row_expr="s/$EXPR_LOG_DATE_GROUP_TIME [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+/\1/p"
+    col_expr="$EXPR_LOG_DATE [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"([a-z0-9_-]+)\\\" .+ :: held ([0-9]+).[0-9]+s.+"
+    row_expr="$EXPR_LOG_DATE_GROUP_DATE_AND_TIME [0-9]+ \w+ $LOG_MODULE .+ Lock \\\"\$name\\\" .+ :: held [0-9]+.[0-9]+s.+"
     process_log $(filter_log $LOG $LOG_MODULE) $DATA_TMP $CSV_PATH "$col_expr" "$row_expr"
 }

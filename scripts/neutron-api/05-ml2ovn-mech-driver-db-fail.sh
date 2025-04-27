@@ -8,6 +8,6 @@ PLOT_TYPE=stackplot
 
 main ()
 {
-    row_expr="$EXPR_LOG_DATE_GROUP_TIME $EXPR_LOG_CONTEXT Mechanism driver 'ovn' failed in \w+: .+"
+    row_expr="$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT Mechanism driver 'ovn' failed in \w+: .+"
     process_log_tally $LOG $DATA_TMP $CSV_PATH "$row_expr" true $Y_LABEL
 }

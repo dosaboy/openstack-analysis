@@ -27,12 +27,10 @@ _init_time ()
     ((min % 10)) && return  0
     ((min == 0)) && min=${min}0
     path=${root}/${prefix}${hour}_${min}
-    if ! [[ -d $path ]]; then
-        mkdir -p $path;
-        for _p in ${columns[@]}; do
-            echo 0 > $path/$_p
-        done
-    fi
+    mkdir -p $path;
+    for _p in ${columns[@]}; do
+        echo 0 > $path/$_p
+    done
 }
 
 init_dataset ()
@@ -112,14 +110,18 @@ create_csv ()
     local OUT=$1
     local DOUT=$2
     local columns=
+    local mark=0
 
     echo -n "datetime," > $OUT
     columns=( $(ls $(ls $DOUT/*/| head -n1| tr -d ':')) )
     echo ${columns[@]}| tr ' ' ',' >> $OUT
     for d in `ls -d $DOUT/{0..9}* 2>/dev/null| sort`; do
         echo -n $(basename $d| tr '_' ':'), >> $OUT
+        $(tail -n 1 $OUT| grep -q "T00:00") && ((mark+=1))
         cat ${d}/*| tr '\n' ','| head -c -1 >> $OUT
         echo "" >> $OUT
+        # Only do 24h
+        ((mark<2)) || break
     done
 }
 

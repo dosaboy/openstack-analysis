@@ -8,6 +8,6 @@ PLOT_TYPE=stackplot
 
 main ()
 {
-    row_expr='^[0-9-]+T([0-9:]+)\.[0-9]+Z.+\|bfd(\S+)?\|\S+\|(\S+): BFD state change: (\S+)'
+    row_expr='^([0-9-]+)T([0-9:]+)\.[0-9]+Z.+\|bfd(\S+)?\|\S+\|(\S+): BFD state change: (\S+)'
     process_log_tally $LOG $DATA_TMP $CSV_PATH "$row_expr" true $Y_LABEL
 }

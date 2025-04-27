@@ -8,6 +8,6 @@ PLOT_TYPE=stackplot
 
 main ()
 {
-    row_expr='^[0-9-]+T([0-9:]+)\.[0-9]+Z.+\|reconnect\|ERR\|\w+:((\S+):[0-9]+): no response to inactivity probe.+'
+    row_expr='^([0-9-]+)T([0-9:]+)\.[0-9]+Z.+\|reconnect\|ERR\|\w+:((\S+):[0-9]+): no response to inactivity probe.+'
     process_log_tally $LOG $DATA_TMP $CSV_PATH "$row_expr" true $Y_LABEL
 }

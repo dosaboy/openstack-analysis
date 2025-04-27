@@ -18,7 +18,8 @@ process_log_max ()
     #   rows_expr: regular expression (sed) used to identify row.
     #              This expression will typically be the same as cols_expr
     #              but with an $INSERT variable in place of the column
-    #              name. Must match exactly two groups; datetime and colname.
+    #              name. Must match exactly three groups; date, time and column
+    #              name.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
 
@@ -36,6 +37,7 @@ process_log_max ()
     local num_jobs=0
     local current=
     local path=
+    local datetime=
 
     log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
     ensure_csv_path $csv_path || return
@@ -51,25 +53,24 @@ process_log_max ()
     readarray -t cols<<<$(get_categories $catcmd $logfile "$cols_expr")
     (( ${#cols[@]} )) && [[ -n ${cols[0]} ]] || return 0
 
-    rows_expr="s,$rows_expr,\1 \2,p"
-    init_dataset $data_tmp "" ${cols[@]}
+    rows_expr="s,$rows_expr,\1T\2 \3,p"
     flag=$(mktemp)
     echo "0" > $flag
-    for c in ${cols[@]}; do
+    # Set INSERT var to column name
+    for INSERT in ${cols[@]}; do
         ((num_jobs+=1))
-        # Set INSERT var to column name
-        INSERT=$c
         readarray -t rows<<<$($catcmd $logfile| sed -rn "$(eval echo \"$rows_expr\")")
         (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || continue
         for row in "${rows[@]}"; do
             declare -a split=( $row )
             # round to nearest 10 minutes
-            t=${split[0]::4}0
-            path=${data_tmp}/${t//:/_}
-            current=$(cat $path/$c)
+            datetime=${split[0]::-4}0
+            path=${data_tmp}/${datetime//:/_}
+            [[ -r $path/$INSERT ]] || init_dataset $data_tmp ${datetime%T*} $INSERT
+            current=$(cat $path/$INSERT)
             # Store max
             if ((${split[1]} > $current)); then
-                echo ${split[1]} > $path/$c
+                echo ${split[1]} > $path/$INSERT
             fi
             echo "1" > $flag
         done &
