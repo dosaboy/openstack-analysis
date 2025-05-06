@@ -62,5 +62,5 @@ done
 wait
 rm -rf $JOBS_DEFS_DIR
 
-$PLOT_GRAPHS || exit 0
+$PLOT_GRAPHS || { echo -e "\nINFO: don't forget to run ./plot.sh (or use --plot) to (re)create graphs from new data."; exit 0; }
 $BIN_ROOT/plot.sh $(echo ${HOST_OVERRIDE[@]}| sed -r 's/(\w+)/--host \1/g' )

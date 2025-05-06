@@ -14,24 +14,16 @@ Then to display the graphs one host as a time:
 ./show_graphs
 ```
 
-Or show a single page with graphs either grouped by host or grouped by agent/module:
+NOTE: if you extract data without --plot you need to run ./plot.sh to re(create) graphs from new data.
 
-```
-firefox <resultsdir>/summary_by_agent.html
-firefox <resultsdir>/summary_by_host.html
-```
+## Adding new datapoints
 
-
-## How to plot a new datapoint
-
-Datapoints are searched using *scripts* that are run in parallel as *jobs*.
+Datapoints are searched using *scripts* that are run as parallel *jobs*.
 
 These take very simple form. Here is an example script and explanation:
 
 ```bash
-#
 # Description: capture amount of time nova-compute takes to acquire a lock
-#
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
@@ -54,4 +46,4 @@ The above script sets the following required global variables:
 * LOG_NAME_FILTER: (optional) filter to ensure we only search required files
 * PLOT_TYPE: (optional) Type of graph to plot. Supported types are ["bar_stacked"](https://matplotlib.org/stable/gallery/lines_bars_and_markers/bar_stacked.html) and ["stackplot"](https://matplotlib.org/stable/gallery/lines_bars_and_markers/stackplot_demo.html). Defaults to "bar_stacked".
 
-It also defines a main() function that is called when the job is run.
+And defines a *main()* function that is called when the job is run.

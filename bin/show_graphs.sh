@@ -9,13 +9,19 @@ if ! [[ -d $GRAPHS_PATH ]]; then
     exit 1
 fi
 
-graphs=()
-for host in $(ls $GRAPHS_PATH); do
-    if (( ${#HOST_OVERRIDE[@]} )); then
-        echo ${HOST_OVERRIDE[@]}| egrep -q "( |^)$host( |\$)" || continue
-        graphs+=( $(find $GRAPHS_PATH/$host -name \*.png) )
-    else
-        find $GRAPHS_PATH/$host -name \*.png| xargs firefox
-    fi
-done
-((${#graphs[@]})) && firefox ${graphs[@]}
+if [[ $GRAPH_DISPLAY_TYPE = agent ]]; then
+    firefox $OUTPUT_PATH/summary_by_agent.html
+elif [[ $GRAPH_DISPLAY_TYPE = host ]]; then
+    firefox $OUTPUT_PATH/summary_by_host.html
+else
+    graphs=()
+    for host in $(ls $GRAPHS_PATH); do
+        if (( ${#HOST_OVERRIDE[@]} )); then
+            echo ${HOST_OVERRIDE[@]}| egrep -q "( |^)$host( |\$)" || continue
+            graphs+=( $(find $GRAPHS_PATH/$host -name \*.png) )
+        else
+            find $GRAPHS_PATH/$host -name \*.png| xargs firefox
+        fi
+    done
+    ((${#graphs[@]})) && firefox ${graphs[@]}
+fi

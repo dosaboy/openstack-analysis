@@ -11,6 +11,7 @@ export AGENT_SCRIPTS=
 export SCRIPT_OVERRIDE=
 export LOGROTATE=
 export MAX_CONCURRENT_JOBS=8
+export GRAPH_DISPLAY_TYPE=host
 
 usage ()
 {
@@ -43,7 +44,11 @@ SYNOPSIS
     --logrotate
         By default we look at the current log i.e. ".log" but this can be set
         to ".7.gz".
-
+    --group-by host|agent|tab
+        By default graphs are displayed grouped by host on a single page. By
+        setting this to agent or host you can view them on a single page either
+        grouped by host or agent. If set to 'tab', graphs will be displayed as
+        one graph per tab grouped by host.
 EOF
 }
 
@@ -62,6 +67,10 @@ while (($# > 0)); do
         --agent)
             AGENT_SCRIPTS=$2
             shift
+            ;;
+        --group-by)
+            [[ $2 = agent ]] || [[ $2 = host ]] || [[ $2 = tab ]] || { echo "ERROR: invalid grouping type '$2'"; exit 1; }
+            GRAPH_DISPLAY_TYPE=$2
             ;;
         -j|--jobs)
             MAX_CONCURRENT_JOBS=$2
