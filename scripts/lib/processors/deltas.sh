@@ -23,13 +23,16 @@ get_timings ()
             else
                 dups[$resource]=1
             fi
+        else
+            # Only store the first occurence but we also log how many dups
+            # there are.
+            TIMINGS_DARRAY_STORE[$resource]=$timestamp
         fi
-        TIMINGS_DARRAY_STORE[$resource]=$timestamp
     done <$path
 
     for res in ${!dups[@]}; do
         ((${dups[$res]}>1)) || continue
-        echo "WARNING: resource $res found more than once (${dups[$res]}) - final occurence recorded"
+        echo "WARNING: resource $res found more than once (${dups[$res]}) - first occurence recorded"
     done
 }
 
