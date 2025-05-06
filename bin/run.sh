@@ -6,17 +6,19 @@ export SCRIPT_ROOT=$BIN_ROOT/../scripts
 [[ -n $SOS_ROOT ]] || { echo "ERROR: sos root required (--path)"; exit 1; }
 
 declare -A ENTRYPOINTS=(
-    [octavia]=/var/log/octavia/octavia-worker${LOGROTATE:-.log.1}
-    [ovs.0]=/var/log/openvswitch/ovsdb-server${LOGROTATE:-.log.1.gz}
-    [ovs.1]=/var/log/openvswitch/ovs-vswitchd${LOGROTATE:-.log.1.gz}
-    [ovn-central.0]=/var/log/ovn/ovsdb-server-nb${LOGROTATE:-.log.1.gz}
-    [ovn-central.1]=/var/log/ovn/ovsdb-server-sb${LOGROTATE:-.log.1.gz}
-    [ovn-central.2]=/var/log/ovn/ovn-northd${LOGROTATE:-.log.1.gz}
-    [neutron-api.0]=/var/log/neutron/neutron-server${LOGROTATE:-.log.1.gz}
-    [neutron-api.1]=/var/log/apache2/other_vhosts_access${LOGROTATE:-.log.1}
-    [nova-compute]=/var/log/nova/nova-compute${LOGROTATE:-.log.1}
-    [nova-api]=/var/log/nova/nova-conductor${LOGROTATE:-.log.1}
-    [rabbitmq-server]=/var/log/rabbitmq/rabbit@*${LOGROTATE:-.log.1}
+    [octavia]=/var/log/octavia/octavia-worker.log$LOGROTATE
+    [ovs.0]=/var/log/openvswitch/ovsdb-server.log$LOGROTATE
+    [ovs.1]=/var/log/openvswitch/ovs-vswitchd.log$LOGROTATE
+    [ovn-central.0]=/var/log/ovn/ovsdb-server-nb.log$LOGROTATE
+    [ovn-central.1]=/var/log/ovn/ovsdb-server-sb.log$LOGROTATE
+    [ovn-central.2]=/var/log/ovn/ovn-northd.log$LOGROTATE
+    [neutron-api.0]=/var/log/neutron/neutron-server.log$LOGROTATE
+    [neutron-api.1]=/var/log/apache2/other_vhosts_access.log$LOGROTATE
+    [nova-compute]=/var/log/nova/nova-compute.log$LOGROTATE
+    [nova-api.0]=/var/log/nova/nova-api-wsgi.log$LOGROTATE
+    [nova-api.1]=/var/log/nova/nova-scheduler.log$LOGROTATE
+    [nova-api.2]=/var/log/nova/nova-conductor.log$LOGROTATE
+    [rabbitmq-server]=/var/log/rabbitmq/rabbit@*.log$LOGROTATE
 )
 
 mkdir -p $OUTPUT_PATH
@@ -40,7 +42,10 @@ for sos in $(ls -d $SOS_ROOT); do
         fi
         export AGENT_NAME=${agent%.*}
         # If matches more then one file take the first
-        export LOG=$(ls $ROOT${ENTRYPOINTS[$agent]} 2>/dev/null| head -n1)
+        for logpath in $ROOT${ENTRYPOINTS[$agent]} $ROOT${ENTRYPOINTS[$agent]}.gz; do
+            export LOG=$(ls $ROOT${ENTRYPOINTS[$agent]} 2>/dev/null| head -n1)
+            [[ -z $LOG ]] || break
+        done
         [[ -n $LOG ]] || continue
         if [[ ${LOG::1} != / ]]; then
             LOG="$(pwd)/$LOG"
