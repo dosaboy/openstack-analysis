@@ -10,5 +10,5 @@ main ()
 {
     seq_start_expr="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT $EXPR_LOG_INSTANCE_UUID Preparing to wait for external event ([0-9a-z-]+) .+"
     seq_end_expr="^$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_CONTEXT $EXPR_LOG_INSTANCE_UUID Received event ([0-9a-z-]+) .+"
-    process_log_deltas $LOG $DATA_TMP $CSV_PATH "$seq_start_expr" "$seq_end_expr" true
+    process_log_deltas_multicol $LOG $DATA_TMP $CSV_PATH "$seq_start_expr" "$seq_end_expr" true
 }
