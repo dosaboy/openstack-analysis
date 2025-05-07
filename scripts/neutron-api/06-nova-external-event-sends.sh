@@ -1,4 +1,6 @@
-# Description: plot every time neutron sends (responds to) an external event from Nova
+# Description:
+#    Capture every time neutron sends (responds to) an external event
+#    from Nova.
 
 # NOTE: only run this for neutron-server logs
 LOG_NAME_FILTER=neutron-server.log

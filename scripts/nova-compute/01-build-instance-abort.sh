@@ -1,4 +1,4 @@
-# Description: capture number of aborted instance create requests
+# Description: capture number of aborted instance create requests.
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log

@@ -1,4 +1,4 @@
-# Description: capture connection resets
+# Description: capture connection resets.
 
 # override - no project ids to check
 get_categories ()

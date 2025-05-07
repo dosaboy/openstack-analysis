@@ -1,4 +1,4 @@
-# Description: capture ovsdbapp rownotfound errors per resource type
+# Description: capture ovsdbapp rownotfound errors per resource type.
 
 # NOTE: only run this for neutron-server logs
 LOG_NAME_FILTER=neutron-server.log

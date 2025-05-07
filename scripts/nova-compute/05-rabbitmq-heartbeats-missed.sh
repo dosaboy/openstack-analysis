@@ -1,4 +1,4 @@
-# Description: capture number rabbitmq missed heartbeats
+# Description: capture number rabbitmq missed heartbeats.
 
 # override - no project ids to check
 get_categories ()

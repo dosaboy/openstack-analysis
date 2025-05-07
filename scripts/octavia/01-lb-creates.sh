@@ -1,4 +1,4 @@
-# Description: loadbalancer creates
+# Description: get number of loadbalancer create requests.
 
 # NOTE: only run this for octavia-worker logs
 LOG_NAME_FILTER=octavia-worker.log

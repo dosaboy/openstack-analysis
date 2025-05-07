@@ -1,4 +1,4 @@
-# Description: plot every time nova creates an external event
+# Description: plot every time nova creates an external event.
 
 # NOTE: only run this for nova-api-wsgi logs
 LOG_NAME_FILTER=nova-api-wsgi.log

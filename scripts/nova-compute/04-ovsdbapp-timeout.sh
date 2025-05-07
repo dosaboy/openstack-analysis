@@ -1,4 +1,4 @@
-# Description: capture number of ovsdbapp timeouts
+# Description: capture number of ovsdbapp timeouts.
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log

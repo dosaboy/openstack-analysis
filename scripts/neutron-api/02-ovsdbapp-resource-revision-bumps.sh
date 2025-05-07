@@ -1,4 +1,4 @@
-# Description: capture ovn resource revision bumps
+# Description: capture ovn resource revision bumps.
 
 # NOTE: only run this for neutron-server logs
 LOG_NAME_FILTER=neutron-server.log

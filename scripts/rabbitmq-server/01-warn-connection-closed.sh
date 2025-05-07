@@ -1,4 +1,5 @@
-# Description: capture connection closed warning events - most likely indicates service restart
+# Description: capture connection closed warning events - most likely indicates
+#              service restart.
 
 LOG_MODULE="\[warning\]"
 Y_LABEL=connections_closed

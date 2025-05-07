@@ -1,4 +1,4 @@
-# Description: loadbalancer create time
+# Description: get loadbalancer create times.
 
 # NOTE: only run this for octavia-worker logs
 LOG_NAME_FILTER=octavia-worker.log

@@ -1,4 +1,5 @@
-# Description:
+# Description: capture occurences of timeouts waiting for network-vif-plugged
+#              events.
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log

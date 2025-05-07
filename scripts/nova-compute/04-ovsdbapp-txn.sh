@@ -1,4 +1,4 @@
-# Description: capture number of ovsdbapp transactions
+# Description: capture number of ovsdbapp transactions.
 
 # override - no project ids to check
 get_categories ()

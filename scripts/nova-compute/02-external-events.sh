@@ -1,4 +1,4 @@
-# Description:
+# Description: get deltas between waiting for and receviing an external event.
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log

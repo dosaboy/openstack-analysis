@@ -1,4 +1,4 @@
-# Description: capture api http return codes
+# Description: capture api http return codes.
 
 skip "can take a very long time to run - enable manually if needed"
 

@@ -1,4 +1,4 @@
-# Description: capture resource tracking for memory usage
+# Description: capture resource tracking for memory usage.
 
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log

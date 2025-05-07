@@ -1,4 +1,4 @@
-# Description: capture ovsdb router bind to host counts
+# Description: capture ovsdb router bind to host counts.
 
 # NOTE: only run this for neutron-server logs
 LOG_NAME_FILTER=neutron-server.log
