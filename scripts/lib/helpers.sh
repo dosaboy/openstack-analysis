@@ -219,7 +219,7 @@ done
 
 SCRIPT_HEADER ()
 {
-    [[ -z $LOG_NAME_FILTER ]] || [[ $LOG =~ $LOG_NAME_FILTER ]] || exit 0
+    [[ -z ${LOG_NAME_FILTER:-""} ]] || [[ $LOG =~ $LOG_NAME_FILTER ]] || exit 0
     . $SCRIPT_ROOT/lib/log_expressions.sh
     export RESULTS_DIR=$(get_results_dir)
     export DATA_TMP=`mktemp -d -p $RESULTS_DIR --suffix=-datatmp`

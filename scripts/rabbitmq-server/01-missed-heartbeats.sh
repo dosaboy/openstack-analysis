@@ -1,6 +1,7 @@
 # Description: capture closed connection error events - indicates missed
 #              heartbeats.
 
+LOG_NAME_FILTER=rabbit@
 LOG_MODULE="\[error\]"
 Y_LABEL=missed_heartbeats
 PLOT_TYPE=bar_stacked

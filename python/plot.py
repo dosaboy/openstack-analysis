@@ -172,8 +172,8 @@ class PLOT():
             ax.stackplot(self.x_data(csv), stacked, labels=labels)
 
         ax.xaxis_date()
-        plt.xlabel(meta['xlabel'])
-        plt.ylabel(meta['ylabel'])
+        plt.xlabel(meta['xlabel'], fontsize=20)
+        plt.ylabel(meta['ylabel'], fontsize=20)
         plt.legend()
         plt.subplots_adjust(**PlotSettings())
         plt.tight_layout()

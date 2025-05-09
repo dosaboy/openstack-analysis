@@ -9,9 +9,12 @@ export PLOT_GRAPHS=false
 export OUTPUT_PATH=results
 export AGENT_SCRIPTS=
 export SCRIPT_OVERRIDE=
-export LOGROTATE=.1
+export LOGROTATE=
 export MAX_CONCURRENT_JOBS=8
 export GRAPH_DISPLAY_TYPE=host
+# This can be used if we call scripts that accept the same opts to avoid having
+# to repeat them explicity.
+CLI_OPTS_CACHE=( "$@" )
 
 usage ()
 {
@@ -42,8 +45,8 @@ SYNOPSIS
     --plot
         Plot graphs from CSV data once complete.
     --logrotate
-        Logrotate depth. By default we look at the current log i.e. ".log" but
-        this can be set e.g. to 7 to get ".log.7" or ".log.7.gz".
+        Integer logrotate depth. By default we look at the current log i.e. ".log"
+        but e.g. if you want logs from 7 days ago (".log.7" or ".log.7.gz") set to 7.
     --group-by host|agent|tab
         By default graphs are displayed grouped by host on a single page. By
         setting this to agent or host you can view them on a single page either
@@ -96,10 +99,8 @@ while (($# > 0)); do
             shift
             ;;
         --logrotate)
-            if [[ -n $2 ]]; then
+            if [[ -n $2 ]] && (($2>0)); then
                 LOGROTATE=".$2"
-            else
-                LOGROTATE=""
             fi
             shift
             ;;

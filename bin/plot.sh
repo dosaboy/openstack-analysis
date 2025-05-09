@@ -7,7 +7,7 @@ GRAPHS_PATH=$OUTPUT_PATH/graphs
 PYTHON_SCRIPTS=$SCRIPT_ROOT/../python
 
 if ! [[ -d $DATA_PATH ]]; then
-    echo "INFO: no data found to plot"
+    echo "INFO: no data found to plot (path=$DATA_PATH)"
     exit 1
 fi
 

@@ -1,6 +1,7 @@
 # Description: capture connection closed warning events - most likely indicates
 #              service restart.
 
+LOG_NAME_FILTER=rabbit@
 LOG_MODULE="\[warning\]"
 Y_LABEL=connections_closed
 PLOT_TYPE=bar_stacked
