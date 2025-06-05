@@ -68,7 +68,10 @@ class PLOT():
                 if host not in self.args.host:
                     continue
 
-            self.stacked(path)
+            try:
+                self.stacked(path)
+            except Exception:  # pylint: disable=broad-exception-caught
+                print(f"ERROR: failed to plot {path}")
 
         for template in ['summary_by_agent.html.j2',
                          'summary_by_host.html.j2']:

@@ -7,16 +7,18 @@ get_timings ()
 
     local sed_expr="$1"
     local path=$2
+    local line_number_for_resource=$3
 
     # NOTE: uses globals to store results:
     #   - TIMINGS_DARRAY_STORE
 
     declare -A dups=()
+    ln=0
     while read line; do
         info=( $(echo "$line"| sed -rn "s/$sed_expr/\1T\2 \3/p") )
         ((${#info[@]})) || continue
         timestamp=${info[0]}
-        resource=${info[1]}
+        $line_number_for_resource && resource=$((ln++)) || resource=${info[1]}
         if [[ ${TIMINGS_DARRAY_STORE[$resource]:-null} != null ]]; then
             if [[ ${dups[$resource]:-null} != null ]]; then
                 dups[$resource]=$(( ${dups[$resource]} + 1))
@@ -60,8 +62,10 @@ process_log_deltas ()
     #                 used to group results.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
+    #   multicol: Group values by resource name (with uuid suffix removed).
+    #   no_resource_id: Set to true if there is no resource id to identify events.
 
-    (($#==6)) || { echo "ERROR: insufficient args ($#) to process_log_deltas()"; exit 1; }
+    (($#>=6 && $#<=8)) || { echo "ERROR: insufficient args ($#) to process_log_deltas()"; exit 1; }
     # Opts
     local logfile=$1
     local data_tmp=$2
@@ -69,6 +73,8 @@ process_log_deltas ()
     local seq_start_expr="$4"
     local seq_end_expr="$5"
     local filter_log_module=$6
+    local multicol=${7:-false}
+    local no_resource_id=${8:-false}
     # Vars
     local catcmd=cat
     local max_jobs=10
@@ -98,14 +104,14 @@ process_log_deltas ()
     [[ -s $ends ]] || return 0
 
     declare -n TIMINGS_DARRAY_STORE="range_starts"
-    get_timings "$seq_start_expr" $starts
+    get_timings "$seq_start_expr" $starts $no_resource_id
     (( ${#range_starts[@]} )) || return 0
 
     declare -n TIMINGS_DARRAY_STORE="range_ends"
-    get_timings "$seq_end_expr" $ends
+    get_timings "$seq_end_expr" $ends $no_resource_id
     (( ${#range_ends[@]} )) || return 0
 
-    init_dataset_multi_date $y_label $data_tmp ${range_starts[@]}
+    $multicol || init_dataset_multi_date $y_label $data_tmp ${range_starts[@]}
 
     for resource in ${!range_starts[@]}; do
         [[ -n ${range_ends[$resource]:-""} ]] || continue
@@ -115,6 +121,10 @@ process_log_deltas ()
         ((${#info[@]})) || continue
         t=${info[0]}
         path=${data_tmp}/${t//:/_}
+        if $multicol; then
+            y_label=$(echo $resource| sed -rn "s/(.+)-${EXPR_UUID}/\1/p")
+            [[ -r $path/$y_label ]] || init_dataset $data_tmp ${range_starts[$resource]%T*} $y_label
+        fi
         current=$(cat $path/$y_label)
         ((current<${info[1]})) || continue
         echo ${info[1]} > $path/$y_label
