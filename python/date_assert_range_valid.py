@@ -1,6 +1,6 @@
 #!/usr/bin/python3
+from datetime import datetime
 import sys
-from datetime import datetime, timedelta
 
 HMS_FMT = '%H:%M:%S'
 ISO8601_FMT = f'%Y-%m-%dT{HMS_FMT}'
@@ -19,20 +19,18 @@ def strptimes(from_date, to_date):
 
 def main(from_date, to_date):
     """
-    Calculate difference between two dates and if it is non-zero return it as
-    a string of the form "<date> <secs>" where date is the to date rounded to
-    the nearest 10 minutes and secs is the difference between the two in
-    seconds.
+    Ensure from_date is earlier than to_date.
 
-    The return is printed to standard output.
+    Exit with 0 if pass or 1 if fail.
 
-    @param from_date:
-    @param to_date:
+    @param from_date: string from date
+    @param to_date: string to date
     """
     _from, _to = strptimes(from_date, to_date)
-    delta = _to - _from
-    if delta > timedelta():
-        print(f"{to_date[:-4]}0 {int(delta.total_seconds())}")
+    if _from > _to:
+        sys.exit(1)
+
+    sys.exit(0)
 
 
 if __name__ == "__main__":

@@ -15,10 +15,11 @@ get_timings ()
     declare -A dups=()
     ln=0
     while read line; do
+        ((ln++))
         info=( $(echo "$line"| sed -rn "s/$sed_expr/\1T\2 \3/p") )
         ((${#info[@]})) || continue
         timestamp=${info[0]}
-        $line_number_for_resource && resource=$((ln++)) || resource=${info[1]}
+        $line_number_for_resource && resource=$ln || resource=${info[1]}
         if [[ ${TIMINGS_DARRAY_STORE[$resource]:-null} != null ]]; then
             if [[ ${dups[$resource]:-null} != null ]]; then
                 dups[$resource]=$(( ${dups[$resource]} + 1))
@@ -83,6 +84,10 @@ process_log_deltas ()
     local path=
     declare -A range_starts=()
     declare -A range_ends=()
+    local end_date=
+    local start_date=
+    local end_date_offset=0
+    local indexes=()
     y_label=${__SCRIPT_NAME__}_deltas
 
     log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
@@ -113,17 +118,35 @@ process_log_deltas ()
 
     $multicol || init_dataset_multi_date $y_label $data_tmp ${range_starts[@]}
 
-    for resource in ${!range_starts[@]}; do
-        [[ -n ${range_ends[$resource]:-""} ]] || continue
+    indexes=( ${!range_starts[@]} )
+    if $no_resource_id; then
+        readarray -t indexes<<<$(echo ${indexes[@]}| tr ' ' '\n'| sort -n)
+    fi
+
+    for _id in ${indexes[@]}; do
+        if $no_resource_id; then
+            end_id=$(($_id + $end_date_offset))
+        else
+            end_id=$_id
+        fi
+        end_date=${range_ends[$end_id]:-""}
+        [[ -n $end_date ]] || continue
+        start_date=${range_starts[$_id]}
+        # If a log file starts with an end date we need to skip it and start
+        # with the first complete range.
+        if ! $(python3 $SCRIPT_ROOT/../python/date_assert_range_valid.py \
+                $start_date $end_date); then
+            $no_resource_id && ((end_date_offset++))
+            continue
+        fi
         info=( $(python3 $SCRIPT_ROOT/../python/datecheck.py \
-                    ${range_starts[$resource]} \
-                    ${range_ends[$resource]}) )
+                $start_date $end_date) )
         ((${#info[@]})) || continue
         t=${info[0]}
         path=${data_tmp}/${t//:/_}
         if $multicol; then
-            y_label=$(echo $resource| sed -rn "s/(.+)-${EXPR_UUID}/\1/p")
-            [[ -r $path/$y_label ]] || init_dataset $data_tmp ${range_starts[$resource]%T*} $y_label
+            y_label=$(echo $_id| sed -rn "s/(.+)-${EXPR_UUID}/\1/p")
+            [[ -r $path/$y_label ]] || init_dataset $data_tmp ${start_date%T*} $y_label
         fi
         current=$(cat $path/$y_label)
         ((current<${info[1]})) || continue

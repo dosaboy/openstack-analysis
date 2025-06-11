@@ -21,6 +21,7 @@ score=yes
 disable=
  missing-function-docstring,
  missing-module-docstring,
+ duplicate-code,
 
 [DESIGN]
 min-public-methods=1
