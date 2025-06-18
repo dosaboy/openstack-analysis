@@ -43,7 +43,7 @@ for sos in $(ls -d $SOS_ROOT); do
         export AGENT_NAME=${agent%.*}
         # If matches more then one file take the first
         for logpath in $ROOT${ENTRYPOINTS[$agent]} $ROOT${ENTRYPOINTS[$agent]}.gz; do
-            export LOG=$(ls $ROOT${ENTRYPOINTS[$agent]} 2>/dev/null| head -n1)
+            export LOG=$(ls $logpath 2>/dev/null| head -n1)
             [[ -z $LOG ]] || break
         done
         [[ -n $LOG ]] || continue
