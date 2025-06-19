@@ -39,6 +39,35 @@ get_timings ()
     done
 }
 
+check_delta ()
+{
+    local _id=$1
+    local start_date="$2"
+    local end_date="$3"
+    local data_tmp=$4
+    local multicol=$5
+    local y_label=$6
+    # vars
+    local info
+    local path
+    local current
+
+    info=( $(python3 $SCRIPT_ROOT/../python/datecheck.py \
+            $start_date $end_date) )
+    ((${#info[@]})) || return
+
+    t=${info[0]}
+    path=${data_tmp}/${t//:/_}
+    if $multicol; then
+        y_label=$(echo $_id| sed -rn "s/(.+)-${EXPR_UUID}/\1/p")
+        [[ -r $path/$y_label ]] || init_dataset $data_tmp ${start_date%T*} $y_label
+    fi
+    current=$(cat $path/$y_label)
+    if ((current<${info[1]})); then
+        echo ${info[1]} > $path/$y_label
+    fi
+}
+
 process_log_deltas ()
 {
     # Description:
@@ -86,6 +115,7 @@ process_log_deltas ()
     declare -A range_ends=()
     local end_date=
     local start_date=
+    local start_date_offset=0
     local end_date_offset=0
     local indexes=()
     y_label=${__SCRIPT_NAME__}_deltas
@@ -125,32 +155,45 @@ process_log_deltas ()
 
     for _id in ${indexes[@]}; do
         if $no_resource_id; then
-            end_id=$(($_id + $end_date_offset))
+            start_date=${range_starts[$((_id + start_date_offset))]:-""}
+            end_date=${range_ends[$((_id + end_date_offset))]:-""}
         else
-            end_id=$_id
+            start_date=${range_starts[$_id]:-""}
+            end_date=${range_ends[$_id]:-""}
         fi
-        end_date=${range_ends[$end_id]:-""}
-        [[ -n $end_date ]] || continue
-        start_date=${range_starts[$_id]}
-        # If a log file starts with an end date we need to skip it and start
-        # with the first complete range.
-        if ! $(python3 $SCRIPT_ROOT/../python/date_assert_range_valid.py \
-                $start_date $end_date); then
-            $no_resource_id && ((end_date_offset++))
+
+        if [[ -z $end_date ]]; then
             continue
         fi
-        info=( $(python3 $SCRIPT_ROOT/../python/datecheck.py \
-                $start_date $end_date) )
-        ((${#info[@]})) || continue
-        t=${info[0]}
-        path=${data_tmp}/${t//:/_}
-        if $multicol; then
-            y_label=$(echo $_id| sed -rn "s/(.+)-${EXPR_UUID}/\1/p")
-            [[ -r $path/$y_label ]] || init_dataset $data_tmp ${start_date%T*} $y_label
+
+        # If not grouping results by resource id (and using line numbers
+        # instead) we are prone to incomplete sequences messing up ordering so
+        # we check for that here.
+        if $no_resource_id; then
+            next_start=${range_starts[$((_id + start_date_offset + 1))]:-"__end__"}
+            # Check for an incomplete sequence where next start is before current
+            # end.
+            if [[ $next_start != "__end__" ]]; then
+                if ! $(python3 $SCRIPT_ROOT/../python/date_assert_range_valid.py \
+                        $end_date $next_start); then
+                    echo "DEBUG: skipping incomplete sequence at start=$start_date"
+                    ((start_date_offset++))
+                    continue
+                fi
+            fi
+
+            # Check for an incomplete sequence where end is before start.
+            while ! $(python3 $SCRIPT_ROOT/../python/date_assert_range_valid.py \
+                    $start_date $end_date); do
+                echo "DEBUG: skipping sequence end with no start at $end_date"
+                ((end_date_offset++))
+                end_id=$(($_id + $end_date_offset))
+                end_date=${range_ends[$end_id]:-""}
+            done
+
         fi
-        current=$(cat $path/$y_label)
-        ((current<${info[1]})) || continue
-        echo ${info[1]} > $path/$y_label
+
+        check_delta $_id $start_date $end_date $data_tmp $multicol $y_label
     done
     create_csv $csv_path $data_tmp
 }
