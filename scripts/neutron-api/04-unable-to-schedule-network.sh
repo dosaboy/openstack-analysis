@@ -4,7 +4,7 @@
 LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=neutron.api.rpc.agentnotifiers.dhcp_rpc_agent_api
 Y_LABEL=unable-to-schedule-network-events
-PLOT_TYPE=stackplot
+PLOT_TYPE=bar_stacked
 
 main ()
 {

@@ -4,7 +4,7 @@
 LOG_NAME_FILTER=ovsdb-server
 LOG_MODULE='\|reconnect\|'
 Y_LABEL=ovsdb-inactivity-probe-timeouts
-PLOT_TYPE=stackplot
+PLOT_TYPE=bar_stacked
 
 main ()
 {
