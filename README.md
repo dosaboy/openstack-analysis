@@ -2,6 +2,12 @@
 
 Extract datapoints from logfiles and plot them as a graph.
 
+## Dependency
+
+```bash
+apt install python3-matplotlib python3-pandas
+```
+
 ## How to run
 
 ```bash
