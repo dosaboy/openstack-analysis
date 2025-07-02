@@ -3,6 +3,12 @@ BIN_ROOT=$(dirname $(readlink --canonicalize $0))
 export SCRIPT_ROOT=$BIN_ROOT/../scripts
 . $SCRIPT_ROOT/lib/env.sh
 
+# Install dependencies required to run this tool
+for p in python3-matplotlib python3-pandas; do
+    dpkg -s $p &>/dev/null && continue
+    sudo apt install -y $p
+done
+
 [[ -n $SOS_ROOT ]] || { echo "ERROR: sos root required (--path)"; exit 1; }
 
 declare -A ENTRYPOINTS=(
