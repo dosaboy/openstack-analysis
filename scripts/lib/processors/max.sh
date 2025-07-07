@@ -22,8 +22,10 @@ process_log_max ()
     #              name.
     #   filter_log_module: Apply the default filter of LOG_MODULE to the
     #                      logfile prior to searching.
+    #   squash_columns: by default we group results by column but can squash
+    #                   them together by setting this to true.
 
-    (($#==6)) || { echo "ERROR: insufficient args ($#) to process_log_max()"; exit 1; }
+    (($#>=6)) || { echo "ERROR: insufficient args ($#) to process_log_max()"; exit 1; }
     # Opts
     local logfile=$1
     local data_tmp=$2
@@ -31,6 +33,7 @@ process_log_max ()
     local cols_expr="$4"
     local rows_expr="$5"
     local filter_log_module=$6
+    local squash_columns=${7:-false}
     # Vars
     local catcmd=cat
     local max_jobs=10
@@ -38,6 +41,7 @@ process_log_max ()
     local current=
     local path=
     local datetime=
+    local colname=
 
     log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
     ensure_csv_path $csv_path || return
@@ -58,6 +62,10 @@ process_log_max ()
     echo "0" > $flag
     # Set INSERT var to column name
     for INSERT in ${cols[@]}; do
+        colname=$INSERT
+        if $squash_columns; then
+            colname=all_projects
+        fi
         ((num_jobs+=1))
         readarray -t rows<<<$($catcmd $logfile| sed -rn "$(eval echo \"$rows_expr\")")
         (( ${#rows[@]} )) && [[ -n ${rows[0]} ]] || continue
@@ -66,11 +74,11 @@ process_log_max ()
             # round to nearest 10 minutes
             datetime=${split[0]::-4}0
             path=${data_tmp}/${datetime//:/_}
-            [[ -r $path/$INSERT ]] || init_dataset $data_tmp ${datetime%T*} $INSERT
-            current=$(cat $path/$INSERT)
+            [[ -r $path/$colname ]] || init_dataset $data_tmp ${datetime%T*} $colname
+            current=$(cat $path/$colname)
             # Store max
             if ((${split[1]} > $current)); then
-                echo ${split[1]} > $path/$INSERT
+                echo ${split[1]} > $path/$colname
             fi
             echo "1" > $flag
         done &
