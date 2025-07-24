@@ -10,6 +10,7 @@ PLOT_TYPE=bar_stacked
 
 main ()
 {
+    # Cap held times to > 1s
     col_expr="$EXPR_LOG_DATE $EXPR_LOG_DEFAULT Lock \\\"\S+\\\" acquired by \\\"(\S+)\\\" :: waited [1-9][0-9]*\.[0-9]+s .+"
     row_expr="$EXPR_LOG_DATE_GROUP_DATE_AND_TIME $EXPR_LOG_DEFAULT Lock \\\"\S+\\\" acquired by \\\"\$INSERT\\\" :: waited ([1-9][0-9]*)\.[0-9]+s .+"
     process_log_tally_multicol $LOG $DATA_TMP $CSV_PATH "$col_expr" "$row_expr" 1 true
