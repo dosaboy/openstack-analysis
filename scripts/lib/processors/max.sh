@@ -42,6 +42,7 @@ process_log_max ()
     local path=
     local datetime=
     local colname=
+    local split=()
 
     log_debug "searching $logfile (lines=$(wc -l $logfile| cut -d ' ' -f 1))"
     ensure_csv_path $csv_path || return
@@ -77,7 +78,7 @@ process_log_max ()
             [[ -r $path/$colname ]] || init_dataset $data_tmp ${datetime%T*} $colname
             current=$(cat $path/$colname)
             # Store max
-            if ((${split[1]} > $current)); then
+            if ((${split[1]} > ${current:-0})); then
                 echo ${split[1]} > $path/$colname
             fi
             echo "1" > $flag
