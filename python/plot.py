@@ -141,6 +141,19 @@ class PLOT():
     def get_output_path(self, name):
         return os.path.join(self.get_output_dir(name), f"{name}.png")
 
+    @staticmethod
+    def set_text(meta):
+        if 'main-title' in meta:
+            plt.title(meta['main-title'], fontsize=20)
+            fontsize = 16
+        else:
+            fontsize = 20
+
+        plt.xlabel(meta['xlabel'], fontsize=fontsize)
+        plt.ylabel(meta['ylabel'], fontsize=fontsize)
+        if 'legend-title' in meta:
+            plt.legend(title=meta['legend-title'])
+
     def stacked(self, path):
         name = self.get_graph_name(path)
         print(f"Plotting data for {name} ({path})")
@@ -175,9 +188,7 @@ class PLOT():
             ax.stackplot(self.x_data(csv), stacked, labels=labels)
 
         ax.xaxis_date()
-        plt.xlabel(meta['xlabel'], fontsize=20)
-        plt.ylabel(meta['ylabel'], fontsize=20)
-        plt.legend()
+        self.set_text(meta)
         plt.subplots_adjust(**PlotSettings())
         plt.tight_layout()
         plt.gcf().set_size_inches(self.PLOT_SIZE_X, self.PLOT_SIZE_Y)

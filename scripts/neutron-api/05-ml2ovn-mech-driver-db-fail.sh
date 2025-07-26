@@ -5,6 +5,7 @@ LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=neutron.plugins.ml2.managers
 Y_LABEL=ovn-mech-driver-db-fail
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="OVN Mech Failure"
 
 main ()
 {

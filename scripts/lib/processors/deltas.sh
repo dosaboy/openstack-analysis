@@ -62,7 +62,15 @@ check_delta ()
         y_label=$(echo $_id| sed -rn "s/(.+)-${EXPR_UUID}/\1/p")
         [[ -r $path/$y_label ]] || init_dataset $data_tmp ${start_date%T*} $y_label
     fi
-    current=$(cat $path/$y_label)
+
+    if ! [[ -f $path/$y_label ]]; then
+        echo "WARNING: path '$path/$y_label' not found (script=${__SCRIPT_NAME__})"
+        mkdir $path
+        current=0
+    else
+        current=$(cat $path/$y_label)
+    fi
+
     if ((current<${info[1]})); then
         echo ${info[1]} > $path/$y_label
     fi

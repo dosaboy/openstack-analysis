@@ -5,6 +5,7 @@ LOG_NAME_FILTER=ovn-northd.log
 LOG_MODULE='\|poll_loop\|'
 Y_LABEL=ovn-northd-cpu-usage-max
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="OVN Northd CPU Usage"
 
 main ()
 {

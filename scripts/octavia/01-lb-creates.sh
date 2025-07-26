@@ -5,6 +5,7 @@ LOG_NAME_FILTER=octavia-worker.log
 LOG_MODULE=octavia.controller.queue.v1.endpoints
 Y_LABEL=lb-creates
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="LB Creates"
 
 main ()
 {

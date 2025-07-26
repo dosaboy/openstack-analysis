@@ -3,8 +3,10 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=oslo_concurrency.lockutils
-Y_LABEL=max-lock-held-time
+Y_LABEL=max-held-time
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Max Lock Held Time"
+LEGEND_TITLE="Owner"
 
 main ()
 {

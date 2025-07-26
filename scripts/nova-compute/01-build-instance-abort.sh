@@ -3,8 +3,9 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
-Y_LABEL=aborted-instance-creates
+Y_LABEL=aborts
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Instance Build Aborts"
 
 main ()
 {

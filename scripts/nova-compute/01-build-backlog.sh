@@ -8,8 +8,9 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
-Y_LABEL=instance-build-max-backlog-size
+Y_LABEL=max-backlog-size
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Nova VM Build Backlog"
 
 main ()
 {

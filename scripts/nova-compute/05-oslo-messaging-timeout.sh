@@ -11,6 +11,7 @@ LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
 Y_LABEL=rpc-timeouts
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Oslo.Messaging Timeouts"
 
 main ()
 {

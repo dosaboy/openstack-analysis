@@ -3,8 +3,10 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
-Y_LABEL=num-instance-deletes
+Y_LABEL=num-deletes
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Instance Deletes"
+LEGEND_TITLE="UserID"
 
 main ()
 {

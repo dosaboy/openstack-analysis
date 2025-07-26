@@ -5,6 +5,7 @@ LOG_NAME_FILTER=ovsdb-server-nb.log
 LOG_MODULE='\|raft\|'
 Y_LABEL=ovn-ovsdb-nb-snapshot-leader-switches
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Snapshot Leader Switches"
 
 main ()
 {

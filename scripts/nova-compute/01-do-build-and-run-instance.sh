@@ -3,8 +3,10 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
-Y_LABEL=num-instance-creates
+Y_LABEL=creates
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Instance Create Requests"
+LEGEND_TITLE="UserID"
 
 main ()
 {

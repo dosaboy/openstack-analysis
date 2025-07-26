@@ -5,6 +5,7 @@ LOG_NAME_FILTER=ovs-vswitchd.log
 LOG_MODULE='\|bfd(\S+)?\|'
 Y_LABEL=ovs-bfd-state-change
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="BFD State Changes"
 
 main ()
 {

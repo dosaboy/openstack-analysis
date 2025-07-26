@@ -5,6 +5,7 @@ LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=ovsdbapp.backend.ovs_idl.command
 Y_LABEL=rownotfounds
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="RowNotFound Errors"
 
 main ()
 {

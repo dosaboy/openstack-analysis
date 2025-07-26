@@ -5,6 +5,7 @@ LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.virt.libvirt.driver
 Y_LABEL=delta-secs
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Get Available Resources Completion Time"
 
 main ()
 {

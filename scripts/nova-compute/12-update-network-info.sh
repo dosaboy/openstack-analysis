@@ -5,6 +5,7 @@ LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.network.neutron
 Y_LABEL=net-info-cache-update-time
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Network Info Cache Update Time"
 
 main ()
 {

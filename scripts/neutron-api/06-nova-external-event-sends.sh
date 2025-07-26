@@ -7,6 +7,7 @@ LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=neutron.notifiers.nova
 Y_LABEL=nova_external_event_sends
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Neutron External Events"
 
 main ()
 {

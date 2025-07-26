@@ -5,6 +5,7 @@ LOG_NAME_FILTER=rabbit@
 LOG_MODULE="\[warning\]"
 Y_LABEL=connections_closed
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Connection Closed Warnings"
 
 main ()
 {

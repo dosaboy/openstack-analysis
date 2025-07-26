@@ -5,6 +5,7 @@ LOG_NAME_FILTER=rabbit@
 LOG_MODULE="\[error\]"
 Y_LABEL=missed_heartbeats
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Connection Closed Errors"
 
 main ()
 {

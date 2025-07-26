@@ -3,8 +3,9 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=ovsdbapp.backend.ovs_idl.command
-Y_LABEL=ovsdbapp-txn-queue-full-events
+Y_LABEL=events
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="OVSDBAPP Transaction Queue Full Errors"
 
 main ()
 {

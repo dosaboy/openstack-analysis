@@ -3,8 +3,9 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
-Y_LABEL=external-event-req-rsp-max-delta-secs
+Y_LABEL=max-delta-secs
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Nova External Events Response Time"
 
 main ()
 {

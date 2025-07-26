@@ -3,8 +3,10 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
-Y_LABEL=max-instance-spawn-time
+Y_LABEL=max-spawn-time
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Max Instance Spawn Time"
+LEGEND_TITLE="UserID"
 
 main ()
 {

@@ -5,6 +5,7 @@ LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=neutron.plugins.ml2.drivers.ovn.mech_driver.ovsdb.impl_idl_ovn
 Y_LABEL=txn_aborted
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="OVN Aborted Transactions"
 
 main ()
 {

@@ -3,8 +3,9 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.network.neutron
-Y_LABEL=net-info-cache-update-time
+Y_LABEL=cache-update-time
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="VM Network Resources Allocation Time"
 
 main ()
 {

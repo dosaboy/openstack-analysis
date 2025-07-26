@@ -5,6 +5,7 @@ LOG_NAME_FILTER=octavia-worker.log
 LOG_MODULE=octavia.controller.queue.v1.endpoints
 Y_LABEL=lb-deletes
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="LB Deletes"
 
 main ()
 {

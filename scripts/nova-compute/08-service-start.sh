@@ -9,8 +9,9 @@ get_categories ()
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.service
-Y_LABEL=nova-compute-restarts
+Y_LABEL=restarts
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Compute Service Restarts"
 
 main ()
 {

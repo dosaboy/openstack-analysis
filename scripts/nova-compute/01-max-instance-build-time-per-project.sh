@@ -3,8 +3,10 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
-Y_LABEL=max-instance-build-time-per-project
+Y_LABEL=build-time
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Max Instance Build Time (per project)"
+LEGEND_TITLE="ProjectID"
 
 main ()
 {

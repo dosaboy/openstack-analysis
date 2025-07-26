@@ -7,6 +7,7 @@ LOG_NAME_FILTER=neutron-server.log
 LOG_MODULE=neutron.wsgi
 Y_LABEL=http-return-codes
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="WSGI Http Return Codes"
 
 main ()
 {

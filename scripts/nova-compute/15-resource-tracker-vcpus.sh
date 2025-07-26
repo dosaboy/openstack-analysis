@@ -5,6 +5,7 @@ LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.resource_tracker
 Y_LABEL=num-vcpus
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Resource Tracker Stats: (vcpus)"
 
 main ()
 {

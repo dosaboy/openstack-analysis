@@ -6,6 +6,8 @@ LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=nova.compute.manager
 Y_LABEL=network-vif-plugged-timeouts
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="VIF Plug Timeouts"
+
 
 main ()
 {

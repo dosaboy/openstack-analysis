@@ -5,8 +5,10 @@
 # NOTE: only run this for nova-compute logs
 LOG_NAME_FILTER=nova-compute.log
 LOG_MODULE=oslo_concurrency.lockutils
-Y_LABEL=max-lock-acquire-time
+Y_LABEL=max-acquire-time
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Max Lock Acquire Time (default/service)"
+LEGEND_TITLE="Owner"
 
 main ()
 {

@@ -3,8 +3,9 @@
 # NOTE: only run this for ovsdb-server logs
 LOG_NAME_FILTER=ovsdb-server
 LOG_MODULE='\|reconnect\|'
-Y_LABEL=ovsdb-inactivity-probe-timeouts
+Y_LABEL=timeouts
 PLOT_TYPE=bar_stacked
+PLOT_TITLE="Inactivity Probe Timeouts"
 
 main ()
 {
