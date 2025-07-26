@@ -96,6 +96,11 @@ process_log_event_deltas ()
         logfile=$(filter_log $logfile $LOG_MODULE)
     fi
 
+    if [[ -n $USER_FILTER ]]; then
+        log_debug "applying user filter to log (script=$__SCRIPT_NAME__)"
+        logfile=$(filter_log $logfile "$USER_FILTER" true)
+    fi
+
     file --mime-type $logfile| grep -q application/gzip && catcmd=zcat
 
     # get sequence end
