@@ -6,7 +6,7 @@ export OVERWRITE_CSV=false
 export HOST_OVERRIDE=()
 export SOS_ROOT=
 export PLOT_GRAPHS=false
-export OUTPUT_PATH=results
+export OUTPUT_PATH=analysis_results
 export AGENT_SCRIPTS=
 export SCRIPT_OVERRIDE=
 export LOGROTATE=
@@ -117,6 +117,12 @@ while (($# > 0)); do
     esac
     shift
 done
+
+if [[ -n $LOGROTATE ]]; then
+    export OUTPUT_PATH=${OUTPUT_PATH}/${LOGROTATE#*.}
+else
+    export OUTPUT_PATH=${OUTPUT_PATH}/current
+fi
 
 export LOCKFILE=$OUTPUT_PATH/lock
 

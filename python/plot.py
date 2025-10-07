@@ -104,8 +104,8 @@ class PLOT():
             if script not in context['hosts'][host]:
                 context['hosts'][host][script] = []
 
-            path = self.get_output_path(self.get_graph_name(path))
-            path = path.partition('/')[2]
+            path = self.get_output_path(self.get_graph_name(path),
+                                        relative=True)
             context['agents'][agent][script].append(
                 {'path': path, 'host': host})
 
@@ -138,8 +138,13 @@ class PLOT():
         b += np.timedelta64(10, 'm')
         return np.arange(a, b, np.timedelta64(10, 'm'))
 
-    def get_output_path(self, name):
-        return os.path.join(self.get_output_dir(name), f"{name}.png")
+    def get_output_path(self, name, relative=False):
+        path = os.path.join(self.get_output_dir(name), f"{name}.png")
+        if relative:
+            path = path.partition(self.args.output_path)[2]
+            path = path.lstrip('/')
+
+        return path
 
     @staticmethod
     def set_text(meta):
