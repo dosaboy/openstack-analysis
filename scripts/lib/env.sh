@@ -10,12 +10,14 @@ export OUTPUT_PATH=analysis_results
 export AGENT_SCRIPTS=
 export SCRIPT_OVERRIDE=
 export LOGROTATE=
-export MAX_CONCURRENT_JOBS=8
+export MAX_CONCURRENT_JOBS=$(lscpu | sed -rn 's/^CPU\(s\):\s+([0-9]+)/\1/p')
 export GRAPH_DISPLAY_TYPE=host
 export USER_FILTER=
 # This can be used if we call scripts that accept the same opts to avoid having
 # to repeat them explicity.
 CLI_OPTS_CACHE=( "$@" )
+
+((MAX_CONCURRENT_JOBS>2)) && MAX_CONCURRENT_JOBS=$((MAX_CONCURRENT_JOBS-2))
 
 usage ()
 {
@@ -30,7 +32,7 @@ SYNOPSIS
     --debug
         Enable debug logs.
     --filter
-        Provide a filter to scipts. This must be grep regex compatiple.
+        Provide a filter to scripts. This must be grep regex compatible.
     --overwrite
         Overwrite existing CSV files. Defaults to false.
     --host

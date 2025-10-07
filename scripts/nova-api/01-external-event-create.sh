@@ -6,6 +6,7 @@ LOG_MODULE=nova.api.openstack.compute.server_external_events
 Y_LABEL=external_event_creates
 PLOT_TYPE=bar_stacked
 PLOT_TITLE="Nova External Events"
+LEGEND_TITLE="Event"
 
 main ()
 {
