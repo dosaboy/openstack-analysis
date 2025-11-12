@@ -6,6 +6,7 @@ LOG_MODULE="\[warning\]"
 Y_LABEL=connections_closed
 PLOT_TYPE=bar_stacked
 PLOT_TITLE="Connection Closed Warnings"
+LEGEND_TITLE="AMQP Client"
 
 main ()
 {

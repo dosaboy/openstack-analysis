@@ -6,6 +6,7 @@ LOG_MODULE="\[error\]"
 Y_LABEL=missed_heartbeats
 PLOT_TYPE=bar_stacked
 PLOT_TITLE="Connection Closed Errors"
+LEGEND_TITLE="AMQP Client"
 
 main ()
 {
