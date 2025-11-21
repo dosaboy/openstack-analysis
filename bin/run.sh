@@ -25,6 +25,7 @@ declare -A ENTRYPOINTS=(
     [nova-api.1]=/var/log/nova/nova-scheduler.log$LOGROTATE
     [nova-api.2]=/var/log/nova/nova-conductor.log$LOGROTATE
     [rabbitmq-server]=/var/log/rabbitmq/rabbit@*.log$LOGROTATE
+    [neutron-gateway.0]=/var/log/neutron/neutron-l3-agent.log$LOGROTATE
 )
 
 mkdir -p $OUTPUT_PATH
