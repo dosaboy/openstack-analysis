@@ -3,7 +3,7 @@
 
 LOG_NAME_FILTER=rabbit@
 LOG_MODULE="\[warning\]"
-Y_LABEL=connections_closed
+Y_LABEL=connections_closed_warnings
 PLOT_TYPE=bar_stacked
 PLOT_TITLE="Connection Closed Warnings"
 LEGEND_TITLE="AMQP Client"

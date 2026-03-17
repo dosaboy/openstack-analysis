@@ -4,7 +4,7 @@ LOG_NAME_FILTER=rabbit@
 LOG_MODULE="\[error\]"
 Y_LABEL=missed_heartbeats
 PLOT_TYPE=bar_stacked
-PLOT_TITLE="Missed Heartbeats from Client"
+PLOT_TITLE="Missed Client Heartbeats"
 LEGEND_TITLE="AMQP Client"
 
 main ()
